@@ -26,6 +26,7 @@ import {
   Check
 } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -212,6 +213,13 @@ export default function HomeScreen() {
   const mapRef = useRef<MapView>(null);
 
   const userZone = mockPlayZones.find(zone => zone.isUserZone);
+
+  // Reset selectedZone when the Home tab comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      setSelectedZone(null);
+    }, [])
+  );
 
   // Request location permissions and get user location
   useEffect(() => {
