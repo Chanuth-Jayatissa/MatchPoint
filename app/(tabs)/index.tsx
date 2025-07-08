@@ -997,7 +997,6 @@ export default function HomeScreen() {
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
-          </View>
         </View>
       </Modal>
 
