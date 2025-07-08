@@ -210,7 +210,7 @@ export default function CommunityScreen() {
             ]}
             onPress={() => setActiveSport(sport)}
           >
-            <Trophy size={16} color={activeSport === sport ? '#FFFFFF' : '#64748B'} />
+            <Text style={styles.sportTabEmoji}>{getSportEmoji(sport)}</Text>
             <Text style={[
               styles.sportTabText,
               activeSport === sport && styles.activeSportTabText
@@ -428,6 +428,10 @@ const styles = StyleSheet.create({
   },
   activeSportTabText: {
     color: '#FFFFFF',
+  },
+  sportTabEmoji: {
+    fontSize: 16,
+    marginRight: 6,
   },
   postsContainer: {
     flex: 1,
