@@ -369,7 +369,7 @@ export default function HomeScreen() {
       // Calculate vertical offset to keep the selected court visible above the drawer
       // The drawer covers ~60% of screen height, so we shift the map center up
       // to ensure the selected marker is clearly visible above the drawer
-      const verticalOffset = -0.008; // Reduced offset for better court marker visibility
+      const verticalOffset = -0.006; // Reduced offset for better court marker visibility
       
       mapRef.current.animateToRegion({
         latitude: court.latitude + verticalOffset,
