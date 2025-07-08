@@ -1190,7 +1190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
-    minHeight: 20,
+    minHeight: 15,
   },
   sportIcon: {
     fontSize: 20,
