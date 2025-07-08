@@ -712,7 +712,7 @@ export default function HomeScreen() {
               transform: [{
                 translateY: playerCardAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [screenHeight, screenHeight * 0.4],
+                  outputRange: [screenHeight, 0],
                 })
               }]
             }
