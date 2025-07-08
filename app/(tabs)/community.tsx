@@ -114,6 +114,19 @@ export default function CommunityScreen() {
     }
   };
 
+  const getSportEmoji = (sport: string) => {
+    switch (sport) {
+      case 'Pickleball':
+        return '🥒';
+      case 'Badminton':
+        return '🏸';
+      case 'Table Tennis':
+        return '🏓';
+      default:
+        return '🏆';
+    }
+  };
+
   const PostCard = ({ post }: { post: Post }) => (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
