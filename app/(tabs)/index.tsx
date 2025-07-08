@@ -323,7 +323,7 @@ export default function HomeScreen() {
       // Calculate vertical offset to keep the selected zone visible above the drawer
       // The drawer covers ~60% of screen height, so we shift the map center up significantly
       // to ensure the selected marker is clearly visible above the drawer
-      const verticalOffset = -0.008; // Negative offset to position marker optimally above drawer
+      const verticalOffset = -0.0085; // Negative offset to position marker optimally above drawer
       
       mapRef.current.animateToRegion({
         latitude: zone.latitude + verticalOffset,
