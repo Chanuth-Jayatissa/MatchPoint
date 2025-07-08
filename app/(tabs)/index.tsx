@@ -676,9 +676,10 @@ export default function HomeScreen() {
           
           <ScrollView 
             contentContainerStyle={{
-            paddingBottom: bottomPadding,
-            paddingHorizontal: 16,
-            paddingTop: 12,}} 
+              paddingBottom: bottomPadding,
+              paddingHorizontal: 16,
+              paddingTop: 12,
+            }} 
             showsVerticalScrollIndicator={false}
           >
             <Text style={styles.courtName}>{selectedCourt.name}</Text>
