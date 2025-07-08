@@ -595,7 +595,7 @@ export default function HomeScreen() {
                 mapRef.current.animateToRegion({
                   latitude: userZone.latitude,
                   longitude: userZone.longitude,
-                  latitudeDelta: 0.02,
+                    outputRange: [screenHeight, 0],
                   longitudeDelta: 0.02,
                 }, 1000);
               }
@@ -925,12 +925,16 @@ export default function HomeScreen() {
         onRequestClose={() => setFiltersVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.filtersModal}>
-            <View style={styles.filtersHeader}>
-              <Text style={styles.filtersTitle}>Filters</Text>
-              <TouchableOpacity onPress={() => setFiltersVisible(false)}>
-                <X size={24} color="#64748B" />
-              </TouchableOpacity>
+              <View style={styles.drawerHandle} />
+              <View style={styles.playerCardHeader}>
+                <Text style={styles.drawerTitle}>Player Details</Text>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={hidePlayerCard}
+                >
+                  <X size={24} color="#64748B" />
+                </TouchableOpacity>
+              </View>
             </View>
             
             <View style={styles.filtersDivider} />
