@@ -420,17 +420,12 @@ export default function HomeScreen() {
       // Hide court drawer
       hideCourtDrawer();
       
-      // Show confirmation toast
-      showToastMessage(`Challenge sent to ${challengingPlayer.username}!`);
-      
       // Reset states
       setCourtMode(false);
       setChallengingPlayer(null);
       
-      // Navigate to Matches tab after a short delay
-      setTimeout(() => {
-        router.push('/(tabs)/matches');
-      }, 1000);
+      // Navigate to Matches tab immediately
+      router.push('/(tabs)/matches');
     }
   };
 
