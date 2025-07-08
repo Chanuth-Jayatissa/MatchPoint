@@ -297,10 +297,6 @@ export default function HomeScreen() {
     };
   };
 
-  const getSportIcon = (sport: string) => {
-    return <Trophy size={16} color="#F97316" />;
-  };
-
   const showDrawer = (zone: PlayZone) => {
     setSelectedZone(zone);
     Animated.spring(drawerAnimation, {
