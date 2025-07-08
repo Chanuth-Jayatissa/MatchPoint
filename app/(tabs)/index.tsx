@@ -833,7 +833,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
             
             <ScrollView 
-              cstyle={styles.courtDrawerContent}
+              cstyle={styles.playerCardContent}
               contentContainerStyle={{
                 flexGrow: 1,
                 paddingHorizontal: 20,
@@ -842,7 +842,6 @@ export default function HomeScreen() {
               }}
               showsVerticalScrollIndicator={false}
             >
-              
               {/* Profile Picture */}
               <View style={styles.profileSection}>
                 <Image source={{ uri: selectedPlayer.profilePic }} style={styles.fullPlayerAvatar} />
