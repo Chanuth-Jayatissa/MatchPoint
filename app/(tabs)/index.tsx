@@ -34,13 +34,14 @@ interface Player {
   id: string;
   username: string;
   profilePic: string;
-  sport: string;
+  sports: string[];
   rating: number;
   availableNow: boolean;
   respectScore: number;
   location: string;
   recentMatches: number;
   zone: string;
+  lastActive?: string;
 }
 
 interface PlayZone {
@@ -67,49 +68,53 @@ const mockPlayers: Player[] = [
     id: '1',
     username: 'PickleballAce_23',
     profilePic: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    sport: 'Pickleball',
+    sports: ['Pickleball', 'Badminton'],
     rating: 1850,
     availableNow: true,
     respectScore: 92,
     location: 'Downtown Courts',
     recentMatches: 15,
-    zone: 'Downtown Sports Complex'
+    zone: 'Downtown Sports Complex',
+    lastActive: '2 min ago'
   },
   {
     id: '2',
     username: 'BadmintonPro',
     profilePic: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    sport: 'Badminton',
+    sports: ['Badminton'],
     rating: 1650,
-    availableNow: true,
+    availableNow: false,
     respectScore: 88,
     location: 'University Gym',
     recentMatches: 22,
-    zone: 'University Recreation Center'
+    zone: 'University Recreation Center',
+    lastActive: '15 min ago'
   },
   {
     id: '3',
     username: 'PingPongKing',
     profilePic: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    sport: 'Table Tennis',
+    sports: ['Table Tennis', 'Pickleball'],
     rating: 1720,
     availableNow: false,
     respectScore: 95,
     location: 'Community Center',
     recentMatches: 8,
-    zone: 'Community Sports Hub'
+    zone: 'Community Sports Hub',
+    lastActive: '2 hours ago'
   },
   {
     id: '4',
     username: 'CourtCrusher',
     profilePic: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    sport: 'Pickleball',
+    sports: ['Pickleball'],
     rating: 1920,
     availableNow: true,
     respectScore: 96,
     location: 'Downtown Courts',
     recentMatches: 28,
-    zone: 'Downtown Sports Complex'
+    zone: 'Downtown Sports Complex',
+    lastActive: 'Just now'
   },
 ];
 
@@ -481,7 +486,7 @@ export default function HomeScreen() {
   const filteredZones = mockPlayZones.map(zone => ({
     ...zone,
     players: zone.players.filter(player => {
-      const sportMatch = filters.sports.includes(player.sport);
+      const sportMatch = player.sports.some(sport => filters.sports.includes(sport));
       const availabilityMatch = !filters.availableNow || player.availableNow;
       return sportMatch && availabilityMatch;
     })
@@ -491,16 +496,59 @@ export default function HomeScreen() {
     court.sports.some(sport => filters.sports.includes(sport))
   );
 
+  const getSportIcon = (sport: string) => {
+    switch (sport) {
+      case 'Pickleball':
+        return '🥒';
+      case 'Badminton':
+        return '🏸';
+      case 'Table Tennis':
+        return '🏓';
+      default:
+        return '🏆';
+    }
+  };
+
+  const getAvailabilityStatus = (player: Player) => {
+    if (player.availableNow) {
+      return { text: 'Available Now', color: '#10B981', dotColor: '#10B981' };
+    } else if (player.lastActive === '15 min ago' || player.lastActive === '2 min ago') {
+      return { text: 'Recently Active', color: '#64748B', dotColor: '#64748B' };
+    } else {
+      return { text: 'Inactive', color: '#64748B', dotColor: '#64748B' };
+    }
+  };
+
   const MiniPlayerCard = ({ player }: { player: Player }) => (
     <TouchableOpacity
       style={styles.miniPlayerCard}
       onPress={() => showPlayerCard(player)}
     >
       <Image source={{ uri: player.profilePic }} style={styles.miniPlayerAvatar} />
-      <Text style={styles.miniPlayerName} numberOfLines={1}>{player.username}</Text>
-      <View style={styles.miniPlayerMeta}>
-        {getSportIcon(player.sport)}
-        {player.availableNow && <View style={styles.availabilityDot} />}
+      
+      <Text style={styles.miniPlayerName} numberOfLines={2}>
+        {player.username}
+      </Text>
+      
+      <View style={styles.miniPlayerSports}>
+        {player.sports.slice(0, 3).map((sport, index) => (
+          <Text key={index} style={styles.sportIcon}>
+            {getSportIcon(sport)}
+          </Text>
+        ))}
+      </View>
+      
+      <View style={styles.miniPlayerStatus}>
+        <View style={[
+          styles.statusDot, 
+          { backgroundColor: getAvailabilityStatus(player).dotColor }
+        ]} />
+        <Text style={[
+          styles.statusText,
+          { color: getAvailabilityStatus(player).color }
+        ]}>
+          {getAvailabilityStatus(player).text}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -782,7 +830,7 @@ export default function HomeScreen() {
               
               <View style={styles.playerStats}>
                 <View style={styles.statItem}>
-                  {getSportIcon(selectedPlayer.sport)}
+                  <Trophy size={16} color="#F97316" />
                   <Text style={styles.statText}>Rating: {selectedPlayer.rating}</Text>
                 </View>
                 
@@ -1126,8 +1174,8 @@ const styles = StyleSheet.create({
   miniPlayerCard: {
     width: (screenWidth - 60) / 2,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 12,
     marginBottom: 16,
     alignItems: 'center',
     shadowColor: '#000',
@@ -1139,29 +1187,47 @@ const styles = StyleSheet.create({
     borderColor: '#F1F5F9',
   },
   miniPlayerAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginTop: 4,
+    marginBottom: 8,
   },
   miniPlayerName: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: 'Inter-SemiBold',
     color: '#0F172A',
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
+    lineHeight: 16,
+    minHeight: 32,
   },
-  miniPlayerMeta: {
+  miniPlayerSports: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+    minHeight: 24,
+  },
+  sportIcon: {
+    fontSize: 20,
+    marginHorizontal: 2,
+  },
+  miniPlayerStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  availabilityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#10B981',
-    marginLeft: 8,
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 4,
+  },
+  statusText: {
+    fontSize: 11,
+    fontFamily: 'Inter-Medium',
+    textAlign: 'center',
   },
   courtName: {
     fontSize: 20,
