@@ -363,19 +363,6 @@ export default function HomeScreen() {
       tension: 100,
       friction: 8,
     }).start();
-
-    // Animate map to focus on the selected court with offset for drawer visibility
-    if (mapRef.current) {
-      // Apply negative offset to position marker above the drawer
-      const verticalOffset = -0.006; // Shift map up to keep marker visible
-      
-      mapRef.current.animateToRegion({
-        latitude: court.latitude + verticalOffset,
-        longitude: court.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      }, 1000);
-    }
   };
 
   const hideCourtDrawer = () => {
@@ -387,16 +374,6 @@ export default function HomeScreen() {
     }).start(() => {
       setSelectedCourt(null);
     });
-
-    // Return map to user's play zone when closing court drawer
-    if (mapRef.current && userZone) {
-      mapRef.current.animateToRegion({
-        latitude: userZone.latitude,
-        longitude: userZone.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      }, 1000);
-    }
   };
 
   const showToastMessage = (message: string) => {
@@ -427,26 +404,6 @@ export default function HomeScreen() {
       tension: 100,
       friction: 8,
     }).start();
-
-    // Animate map to focus on the player's zone with offset for card visibility
-    if (mapRef.current) {
-      // Find the play zone for this player
-      const playerZone = mockPlayZones.find(zone => 
-        zone.players.some(p => p.id === player.id)
-      );
-      
-      if (playerZone) {
-        // Apply negative offset to position marker above the player card
-        const verticalOffset = -0.006; // Shift map up to keep marker visible
-        
-        mapRef.current.animateToRegion({
-          latitude: playerZone.latitude + verticalOffset,
-          longitude: playerZone.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
-        }, 1000);
-      }
-    }
   };
 
   const hidePlayerCard = () => {
@@ -458,16 +415,6 @@ export default function HomeScreen() {
     }).start(() => {
       setSelectedPlayer(null);
     });
-
-    // Return map to user's play zone when closing player card
-    if (mapRef.current && userZone) {
-      mapRef.current.animateToRegion({
-        latitude: userZone.latitude,
-        longitude: userZone.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      }, 1000);
-    }
   };
 
   const handleChallenge = (player: Player) => {
@@ -733,7 +680,13 @@ export default function HomeScreen() {
           </View>
           
           <ScrollView 
-            style={styles.courtDrawerContent}
+            cstyle={styles.courtDrawerContent}
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingHorizontal: 20,
+              paddingTop: 16,
+              paddingBottom: 100,
+            }}
             showsVerticalScrollIndicator={false}
           >
             <Text style={styles.courtName}>{selectedCourt.name}</Text>
@@ -788,9 +741,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
             
             <ScrollView  
-              style={styles.playerCardContent}
+              cstyle={styles.playerCardContent}
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingHorizontal: 20,
+                paddingTop: 16,
+                paddingBottom: 120,
+              }}
               showsVerticalScrollIndicator={false}
             >
+              showsVerticalScrollIndicator={false}>
               <Image source={{ uri: selectedPlayer.profilePic }} style={styles.fullPlayerAvatar} />
               <Text style={styles.fullPlayerName}>{selectedPlayer.username}</Text>
               <Text style={styles.fullPlayerLocation}>{selectedPlayer.zone}</Text>
@@ -1131,7 +1091,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   playersGrid: {
     flexDirection: 'row',
@@ -1299,10 +1259,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   playerCardContent: {
-    flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 120,
+    paddingBottom: 20,
   },
   fullPlayerAvatar: {
     width: 100,
