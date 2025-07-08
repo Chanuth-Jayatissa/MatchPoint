@@ -301,19 +301,6 @@ export default function HomeScreen() {
     return <Trophy size={16} color="#F97316" />;
   };
 
-  const getSportEmoji = (sport: string) => {
-    switch (sport) {
-      case 'Pickleball':
-        return '🥒';
-      case 'Badminton':
-        return '🏸';
-      case 'Table Tennis':
-        return '🏓';
-      default:
-        return '🏆';
-    }
-  };
-
   const showDrawer = (zone: PlayZone) => {
     setSelectedZone(zone);
     Animated.spring(drawerAnimation, {
