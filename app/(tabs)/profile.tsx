@@ -78,6 +78,19 @@ export default function ProfileScreen() {
     return <Trophy size={20} color="#F97316" />;
   };
 
+  const getSportEmoji = (sport: string) => {
+    switch (sport) {
+      case 'Pickleball':
+        return '🥒';
+      case 'Badminton':
+        return '🏸';
+      case 'Table Tennis':
+        return '🏓';
+      default:
+        return '🏆';
+    }
+  };
+
   const getTrendIcon = (trend: string) => {
     if (trend === 'up') return <TrendingUp size={16} color="#10B981" />;
     if (trend === 'down') return <TrendingUp size={16} color="#EF4444" style={{ transform: [{ rotate: '180deg' }] }} />;
@@ -87,7 +100,7 @@ export default function ProfileScreen() {
   const SportRatingCard = ({ sport }: { sport: SportRating }) => (
     <View style={styles.sportCard}>
       <View style={styles.sportHeader}>
-        {getSportIcon(sport.sport)}
+        <Text style={styles.sportEmoji}>{getSportEmoji(sport.sport)}</Text>
         <Text style={styles.sportName}>{sport.sport}</Text>
         {getTrendIcon(sport.trend)}
       </View>
@@ -107,8 +120,7 @@ export default function ProfileScreen() {
     <View style={styles.matchCard}>
       <View style={styles.matchHeader}>
         <View style={styles.matchInfo}>
-          <Text style={styles.matchOpponent}>{match.opponent}</Text>
-          <Text style={styles.matchSport}>{match.sport}</Text>
+          <View style={styles.matchOpponentRow}>
         </View>
         <View style={styles.matchResult}>
           <Text style={[
@@ -397,6 +409,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  sportEmoji: {
+    fontSize: 18,
+    marginRight: 8,
+  },
   sportName: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
@@ -447,11 +463,15 @@ const styles = StyleSheet.create({
   matchInfo: {
     flex: 1,
   },
+  matchOpponentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
   matchOpponent: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#0F172A',
-    marginBottom: 2,
   },
   matchSport: {
     fontSize: 14,
