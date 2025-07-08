@@ -1194,7 +1194,7 @@ const styles = StyleSheet.create({
   },
   sportIcon: {
     fontSize: 16,
-    marginHorizontal: 4,
+    marginHorizontal: 8,
     marginTop: 0,
   },
   miniPlayerStatus: {
