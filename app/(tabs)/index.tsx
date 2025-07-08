@@ -42,6 +42,8 @@ interface Player {
   recentMatches: number;
   zone: string;
   lastActive?: string;
+  sportRatings: { sport: string; rating: number }[];
+  recentMatchHistory: { date: string; sport: string; opponent: string; result: 'Win' | 'Loss' }[];
 }
 
 interface PlayZone {
@@ -76,6 +78,15 @@ const mockPlayers: Player[] = [
     recentMatches: 15,
     zone: 'Downtown Sports Complex',
     lastActive: '2 min ago'
+    sportRatings: [
+      { sport: 'Pickleball', rating: 1850 },
+      { sport: 'Badminton', rating: 1720 }
+    ],
+    recentMatchHistory: [
+      { date: '12/15', sport: 'Pickleball', opponent: 'CourtCrusher', result: 'Win' },
+      { date: '12/12', sport: 'Badminton', opponent: 'NetNinja', result: 'Loss' },
+      { date: '12/08', sport: 'Pickleball', opponent: 'SmashMaster', result: 'Win' }
+    ]
   },
   {
     id: '2',
@@ -89,6 +100,14 @@ const mockPlayers: Player[] = [
     recentMatches: 22,
     zone: 'University Recreation Center',
     lastActive: '15 min ago'
+    sportRatings: [
+      { sport: 'Badminton', rating: 1650 }
+    ],
+    recentMatchHistory: [
+      { date: '12/14', sport: 'Badminton', opponent: 'ShuttleKing', result: 'Win' },
+      { date: '12/11', sport: 'Badminton', opponent: 'NetMaster', result: 'Win' },
+      { date: '12/09', sport: 'Badminton', opponent: 'CourtAce', result: 'Loss' }
+    ]
   },
   {
     id: '3',
@@ -102,6 +121,15 @@ const mockPlayers: Player[] = [
     recentMatches: 8,
     zone: 'Community Sports Hub',
     lastActive: '2 hours ago'
+    sportRatings: [
+      { sport: 'Table Tennis', rating: 1720 },
+      { sport: 'Pickleball', rating: 1550 }
+    ],
+    recentMatchHistory: [
+      { date: '12/13', sport: 'Table Tennis', opponent: 'SpinMaster', result: 'Win' },
+      { date: '12/10', sport: 'Pickleball', opponent: 'PaddleAce', result: 'Loss' },
+      { date: '12/07', sport: 'Table Tennis', opponent: 'LoopKing', result: 'Win' }
+    ]
   },
   {
     id: '4',
@@ -115,6 +143,14 @@ const mockPlayers: Player[] = [
     recentMatches: 28,
     zone: 'Downtown Sports Complex',
     lastActive: 'Just now'
+    sportRatings: [
+      { sport: 'Pickleball', rating: 1920 }
+    ],
+    recentMatchHistory: [
+      { date: '12/15', sport: 'Pickleball', opponent: 'PickleballAce_23', result: 'Loss' },
+      { date: '12/13', sport: 'Pickleball', opponent: 'NetCrusher', result: 'Win' },
+      { date: '12/11', sport: 'Pickleball', opponent: 'PaddlePro', result: 'Win' }
+    ]
   },
 ];
 
@@ -797,41 +833,79 @@ export default function HomeScreen() {
             </TouchableOpacity>
             
             <ScrollView  
-              cstyle={styles.playerCardContent}
-              contentContainerStyle={{
-                flexGrow: 1,
-                paddingHorizontal: 20,
-                paddingTop: 16,
-                paddingBottom: 120,
-              }}
-              showsVerticalScrollIndicator={false}
-            >
+              style={styles.playerCardContent}
               showsVerticalScrollIndicator={false}>
-              <Image source={{ uri: selectedPlayer.profilePic }} style={styles.fullPlayerAvatar} />
-              <Text style={styles.fullPlayerName}>{selectedPlayer.username}</Text>
-              <Text style={styles.fullPlayerLocation}>{selectedPlayer.zone}</Text>
               
-              <View style={styles.playerStats}>
-                <View style={styles.statItem}>
-                  <Trophy size={16} color="#F97316" />
-                  <Text style={styles.statText}>Rating: {selectedPlayer.rating}</Text>
-                </View>
+              {/* Profile Picture */}
+              <View style={styles.profileSection}>
+                <Image source={{ uri: selectedPlayer.profilePic }} style={styles.fullPlayerAvatar} />
                 
-                <View style={styles.statItem}>
-                  <Star size={16} color="#F59E0B" />
-                  <Text style={styles.statText}>Respect: {selectedPlayer.respectScore}/100</Text>
-                </View>
-                
-                <Text style={styles.recentMatchesText}>Recent matches: {selectedPlayer.recentMatches}</Text>
+                {/* Username */}
+                <Text style={styles.fullPlayerName} numberOfLines={2}>
+                  {selectedPlayer.username}
+                </Text>
               </View>
               
-              <TouchableOpacity
-                style={styles.challengeButton}
-                onPress={() => handleChallenge(selectedPlayer)}
-              >
-                <Zap size={20} color="#FFFFFF" />
-                <Text style={styles.challengeButtonText}>Challenge Player</Text>
-              </TouchableOpacity>
+              {/* Ratings Section */}
+              <View style={styles.ratingsSection}>
+                <Text style={styles.sectionTitle}>Ratings:</Text>
+                {selectedPlayer.sportRatings
+                  .sort((a, b) => b.rating - a.rating) // Sort by highest rating
+                  .map((sportRating, index) => (
+                    <View key={index} style={styles.ratingItem}>
+                      <Text style={styles.sportIcon}>{getSportIcon(sportRating.sport)}</Text>
+                      <Text style={styles.ratingText}>
+                        {sportRating.sport} — {sportRating.rating}
+                      </Text>
+                    </View>
+                  ))}
+              </View>
+              
+              {/* Respect Rating */}
+              <View style={styles.respectSection}>
+                <View style={styles.respectItem}>
+                  <Text style={styles.respectIcon}>⭐️</Text>
+                  <Text style={styles.respectText}>
+                    Respect: {selectedPlayer.respectScore}/100
+                  </Text>
+                </View>
+              </View>
+              
+              {/* Recent Matches */}
+              <View style={styles.recentMatchesSection}>
+                <Text style={styles.sectionTitle}>Recent Matches:</Text>
+                {selectedPlayer.recentMatchHistory.slice(0, 3).map((match, index) => (
+                  <View key={index} style={styles.matchItem}>
+                    <Text style={styles.matchDate}>{match.date}</Text>
+                    <Text style={styles.matchSeparator}> — </Text>
+                    <Text style={styles.matchSportIcon}>{getSportIcon(match.sport)}</Text>
+                    <Text style={styles.matchDetails}>
+                      vs {match.opponent} — 
+                    </Text>
+                    <Text style={[
+                      styles.matchResult,
+                      { color: match.result === 'Win' ? '#10B981' : '#EF4444' }
+                    ]}>
+                      {match.result}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              
+              {/* Action Buttons */}
+              <View style={styles.actionButtonsSection}>
+                <TouchableOpacity
+                  style={styles.challengeButton}
+                  onPress={() => handleChallenge(selectedPlayer)}
+                >
+                  <Zap size={20} color="#FFFFFF" />
+                  <Text style={styles.challengeButtonText}>Challenge Player</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.followButton}>
+                  <Text style={styles.followButtonText}>Follow Player</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </Animated.View>
@@ -1307,7 +1381,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: screenHeight * 0.6,
+    height: screenHeight * 0.85,
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -1323,7 +1397,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingTop: 20,
   },
   closeButton: {
     position: 'absolute',
@@ -1335,30 +1408,135 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   playerCardContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    flex: 1,
+    paddingTop: 60, // Space for close button
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  profileSection: {
+    alignItems: 'center',
+    marginBottom: 32,
   },
   fullPlayerAvatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignSelf: 'center',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     marginBottom: 16,
-    marginTop: 20,
   },
   fullPlayerName: {
     fontSize: 24,
     fontFamily: 'Inter-Bold',
     color: '#0F172A',
     textAlign: 'center',
+    lineHeight: 30,
+    paddingHorizontal: 20,
+  },
+  ratingsSection: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#0F172A',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  ratingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  fullPlayerLocation: {
+  ratingText: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
-    color: '#64748B',
-    textAlign: 'center',
+    color: '#0F172A',
+    marginLeft: 8,
+  },
+  respectSection: {
+    alignItems: 'center',
     marginBottom: 24,
+  },
+  respectItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  respectIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  respectText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#0F172A',
+  },
+  recentMatchesSection: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  matchItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  matchDate: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#0F172A',
+  },
+  matchSeparator: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#64748B',
+  },
+  matchSportIcon: {
+    fontSize: 16,
+    marginRight: 4,
+  },
+  matchDetails: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#0F172A',
+    marginRight: 4,
+  },
+  matchResult: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+  },
+  actionButtonsSection: {
+    alignItems: 'center',
+  },
+  challengeButton: {
+    flexDirection: 'row',
+    backgroundColor: '#F97316',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '85%',
+    marginBottom: 12,
+  },
+  challengeButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+    marginLeft: 8,
+  },
+  followButton: {
+    borderWidth: 1,
+    borderColor: '#1D4ED8',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '85%',
+  },
+  followButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#1D4ED8',
   },
   playerStats: {
     backgroundColor: '#F8FAFC',
@@ -1383,7 +1561,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 8,
   },
-  challengeButton: {
+  oldChallengeButton: {
     flexDirection: 'row',
     backgroundColor: '#F97316',
     borderRadius: 12,
@@ -1392,7 +1570,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  challengeButtonText: {
+  oldChallengeButtonText: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
@@ -1402,6 +1580,129 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+  },
+  filtersModal: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+  },
+  filtersHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  filtersTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#0F172A',
+  },
+  filtersDivider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginHorizontal: 20,
+  },
+  filtersContent: {
+    padding: 20,
+  },
+  filterSectionTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#0F172A',
+    marginBottom: 16,
+  },
+  sportsChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 24,
+  },
+  sportFilterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#64748B',
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  sportFilterChipSelected: {
+    backgroundColor: '#1D4ED8',
+    borderColor: '#1D4ED8',
+  },
+  sportFilterChipText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#0F172A',
+  },
+  sportFilterChipTextSelected: {
+    color: '#FFFFFF',
+    marginRight: 6,
+  },
+  availabilityFilter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  filterLabel: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#0F172A',
+  },
+  filtersFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  resetButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  resetButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#64748B',
+  },
+  applyButton: {
+    backgroundColor: '#1D4ED8',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  applyButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+  },
+  toast: {
+    position: 'absolute',
+    bottom: 100,
+    left: 20,
+    right: 20,
+    backgroundColor: '#10B981',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  toastText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   filtersModal: {
     backgroundColor: '#FFFFFF',
