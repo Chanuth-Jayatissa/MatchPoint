@@ -77,7 +77,7 @@ const mockPlayers: Player[] = [
     location: 'Downtown Courts',
     recentMatches: 15,
     zone: 'Downtown Sports Complex',
-    lastActive: '2 min ago'
+    lastActive: '2 min ago',
     sportRatings: [
       { sport: 'Pickleball', rating: 1850 },
       { sport: 'Badminton', rating: 1720 }
@@ -99,7 +99,7 @@ const mockPlayers: Player[] = [
     location: 'University Gym',
     recentMatches: 22,
     zone: 'University Recreation Center',
-    lastActive: '15 min ago'
+    lastActive: '15 min ago',
     sportRatings: [
       { sport: 'Badminton', rating: 1650 }
     ],
@@ -120,7 +120,7 @@ const mockPlayers: Player[] = [
     location: 'Community Center',
     recentMatches: 8,
     zone: 'Community Sports Hub',
-    lastActive: '2 hours ago'
+    lastActive: '2 hours ago',
     sportRatings: [
       { sport: 'Table Tennis', rating: 1720 },
       { sport: 'Pickleball', rating: 1550 }
@@ -142,7 +142,7 @@ const mockPlayers: Player[] = [
     location: 'Downtown Courts',
     recentMatches: 28,
     zone: 'Downtown Sports Complex',
-    lastActive: 'Just now'
+    lastActive: 'Just now',
     sportRatings: [
       { sport: 'Pickleball', rating: 1920 }
     ],
