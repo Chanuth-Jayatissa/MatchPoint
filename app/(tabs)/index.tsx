@@ -65,9 +65,9 @@ interface Court {
 const mockPlayers: Player[] = [
   {
     id: '1',
-    username: 'TennisAce_23',
+    username: 'PickleballAce_23',
     profilePic: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    sport: 'Tennis',
+    sport: 'Pickleball',
     rating: 1850,
     availableNow: true,
     respectScore: 92,
@@ -103,7 +103,7 @@ const mockPlayers: Player[] = [
     id: '4',
     username: 'CourtCrusher',
     profilePic: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-    sport: 'Tennis',
+    sport: 'Pickleball',
     rating: 1920,
     availableNow: true,
     respectScore: 96,
@@ -143,8 +143,8 @@ const mockPlayZones: PlayZone[] = [
 const mockCourts: Court[] = [
   {
     id: '1',
-    name: 'Downtown Tennis Court #1',
-    sports: ['Tennis'],
+    name: 'Downtown Pickleball Court #1',
+    sports: ['Pickleball'],
     location: 'Downtown Sports Complex',
     image: 'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
     latitude: 40.7128,
@@ -170,8 +170,8 @@ const mockCourts: Court[] = [
   },
   {
     id: '4',
-    name: 'Elite Tennis Academy Court A',
-    sports: ['Tennis'],
+    name: 'Elite Pickleball Academy Court A',
+    sports: ['Pickleball'],
     location: 'Downtown Sports Complex',
     image: 'https://images.pexels.com/photos/1263349/pexels-photo-1263349.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
     latitude: 40.7130,
@@ -202,7 +202,7 @@ export default function HomeScreen() {
   const [locationPermission, setLocationPermission] = useState<Location.PermissionStatus | null>(null);
   
   const [filters, setFilters] = useState({
-    sports: ['Tennis', 'Badminton', 'Table Tennis'],
+    sports: ['Pickleball', 'Badminton', 'Table Tennis'],
     availableNow: false,
   });
 
@@ -298,8 +298,8 @@ export default function HomeScreen() {
 
   const getSportEmoji = (sport: string) => {
     switch (sport) {
-      case 'Tennis':
-        return '🎾';
+      case 'Pickleball':
+        return '🏓';
       case 'Badminton':
         return '🏸';
       case 'Table Tennis':
@@ -802,7 +802,7 @@ export default function HomeScreen() {
             <View style={styles.filtersContent}>
               <Text style={styles.filterSectionTitle}>Sports</Text>
               <View style={styles.sportsChips}>
-                {['Tennis', 'Badminton', 'Table Tennis'].map((sport) => (
+                {['Pickleball', 'Badminton', 'Table Tennis'].map((sport) => (
                   <TouchableOpacity
                     key={sport}
                     style={[
@@ -845,7 +845,7 @@ export default function HomeScreen() {
             <View style={styles.filtersFooter}>
               <TouchableOpacity
                 style={styles.resetButton}
-                onPress={() => setFilters({ sports: ['Tennis', 'Badminton', 'Table Tennis'], availableNow: false })}
+                onPress={() => setFilters({ sports: ['Pickleball', 'Badminton', 'Table Tennis'], availableNow: false })}
               >
                 <Text style={styles.resetButtonText}>Reset</Text>
               </TouchableOpacity>

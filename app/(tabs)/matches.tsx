@@ -30,11 +30,11 @@ const mockMatches: Match[] = [
   {
     id: '1',
     opponent: {
-      username: 'TennisAce_23',
+      username: 'PickleballAce_23',
       profilePic: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
     },
-    sport: 'Tennis',
-    court: 'Downtown Tennis Court #1',
+    sport: 'Pickleball',
+    court: 'Downtown Pickleball Court #1',
     status: 'to-log',
     timestamp: '2 hours ago',
   },

@@ -40,10 +40,10 @@ const mockPosts: Post[] = [
   {
     id: '1',
     author: {
-      username: 'TennisAce_23',
+      username: 'PickleballAce_23',
       profilePic: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
     },
-    sport: 'Tennis',
+    sport: 'Pickleball',
     content: 'Just hit my first perfect serve ace! Been working on my technique for months. The key is really in the wrist snap and follow-through. Anyone else struggling with serves?',
     image: 'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop',
     tag: 'highlight',
@@ -90,7 +90,7 @@ export default function CommunityScreen() {
   const [sortBy, setSortBy] = useState<'recent' | 'liked'>('recent');
   const [sortDropdownVisible, setSortDropdownVisible] = useState(false);
 
-  const sports = ['Badminton', 'Table Tennis', 'Tennis'];
+  const sports = ['Badminton', 'Table Tennis', 'Pickleball'];
 
   const getTagIcon = (tag: string) => {
     switch (tag) {

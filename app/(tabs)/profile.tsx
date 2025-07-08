@@ -28,7 +28,7 @@ interface RecentMatch {
 }
 
 const mockSportRatings: SportRating[] = [
-  { sport: 'Tennis', rating: 1850, trend: 'up' },
+  { sport: 'Pickleball', rating: 1850, trend: 'up' },
   { sport: 'Badminton', rating: 1720, trend: 'stable' },
   { sport: 'Table Tennis', rating: 0, trend: 'stable' }, // Unrated
 ];
@@ -36,8 +36,8 @@ const mockSportRatings: SportRating[] = [
 const mockRecentMatches: RecentMatch[] = [
   {
     id: '1',
-    opponent: 'TennisAce_23',
-    sport: 'Tennis',
+    opponent: 'PickleballAce_23',
+    sport: 'Pickleball',
     result: 'win',
     score: '6-4, 7-5',
     date: '2 days ago'
@@ -61,7 +61,7 @@ const mockRecentMatches: RecentMatch[] = [
   {
     id: '4',
     opponent: 'CourtCrusher',
-    sport: 'Tennis',
+    sport: 'Pickleball',
     result: 'win',
     score: '6-2, 6-3',
     date: '1 week ago'
