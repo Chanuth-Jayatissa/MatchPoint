@@ -37,7 +37,7 @@ const mockThreads: Thread[] = [
   {
     id: '1',
     opponent: {
-      username: 'TennisAce_23',
+      username: 'PickleballAce_23',
       profilePic: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
     },
     lastMessage: 'Great match! Looking forward to the rematch.',
@@ -45,7 +45,7 @@ const mockThreads: Thread[] = [
     isUnread: true,
     messages: [
       { id: '1', text: 'Hey! Ready for our match?', timestamp: '10:30 AM', isFromMe: false },
-      { id: '2', text: 'Absolutely! See you at Downtown Court #1', timestamp: '10:32 AM', isFromMe: true },
+      { id: '2', text: 'Absolutely! See you at Downtown Pickleball Court #1', timestamp: '10:32 AM', isFromMe: true },
       { id: '3', text: 'Perfect, I\'ll be there 15 minutes early to warm up', timestamp: '10:35 AM', isFromMe: false },
       { id: '4', text: 'Sounds good! Bring your A-game 😄', timestamp: '10:36 AM', isFromMe: true },
       { id: '5', text: 'Great match! Looking forward to the rematch.', timestamp: '2:15 PM', isFromMe: false },
