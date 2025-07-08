@@ -192,7 +192,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="community"
+        name="social"
         options={{
           title: 'Social',
         }}
