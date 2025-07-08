@@ -737,7 +737,17 @@ export default function HomeScreen() {
               <X size={24} color="#64748B" />
             </TouchableOpacity>
             
-            <ScrollView style={styles.playerCardContent} showsVerticalScrollIndicator={false}>
+            <ScrollView  
+              cstyle={styles.playerCardContent}
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingHorizontal: 20,
+                paddingTop: 16,
+                paddingBottom: 100,
+              }}
+              showsVerticalScrollIndicator={false}
+            >
+              showsVerticalScrollIndicator={false}>
               <Image source={{ uri: selectedPlayer.profilePic }} style={styles.fullPlayerAvatar} />
               <Text style={styles.fullPlayerName}>{selectedPlayer.username}</Text>
               <Text style={styles.fullPlayerLocation}>{selectedPlayer.zone}</Text>
