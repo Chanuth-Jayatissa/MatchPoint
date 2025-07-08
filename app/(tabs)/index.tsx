@@ -13,6 +13,7 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { 
@@ -187,6 +188,7 @@ const mockCourts: Court[] = [
 ];
 
 export default function HomeScreen() {
+  const { bottom: bottomPadding } = useSafeAreaInsets();
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [selectedZone, setSelectedZone] = useState<PlayZone | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
