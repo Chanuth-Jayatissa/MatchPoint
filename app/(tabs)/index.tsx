@@ -743,7 +743,7 @@ export default function HomeScreen() {
                 flexGrow: 1,
                 paddingHorizontal: 20,
                 paddingTop: 16,
-                paddingBottom: 100,
+                paddingBottom: 120,
               }}
               showsVerticalScrollIndicator={false}
             >
