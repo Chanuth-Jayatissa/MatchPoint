@@ -677,11 +677,13 @@ export default function HomeScreen() {
           </View>
           
           <ScrollView 
+            cstyle={styles.courtDrawerContent}
             contentContainerStyle={{
-              paddingBottom: bottomPadding,
-              paddingHorizontal: 16,
-              paddingTop: 12,
-            }} 
+              flexGrow: 1,
+              paddingHorizontal: 20,
+              paddingTop: 16,
+              paddingBottom: 120,
+            }}
             showsVerticalScrollIndicator={false}
           >
             <Text style={styles.courtName}>{selectedCourt.name}</Text>
