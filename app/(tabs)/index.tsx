@@ -674,7 +674,13 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
           
-          <ScrollView style={styles.courtDrawerContent} showsVerticalScrollIndicator={false}>
+          <ScrollView 
+            contentContainerStyle={{
+            paddingBottom: bottomPadding,
+            paddingHorizontal: 16,
+            paddingTop: 12,}} 
+            showsVerticalScrollIndicator={false}
+          >
             <Text style={styles.courtName}>{selectedCourt.name}</Text>
             
             <View style={styles.courtSports}>
