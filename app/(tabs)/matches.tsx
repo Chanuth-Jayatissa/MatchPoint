@@ -100,6 +100,19 @@ export default function MatchesScreen() {
     }
   };
 
+  const getSportEmoji = (sport: string) => {
+    switch (sport) {
+      case 'Pickleball':
+        return '🥒';
+      case 'Badminton':
+        return '🏸';
+      case 'Table Tennis':
+        return '🏓';
+      default:
+        return '🏆';
+    }
+  };
+
   const filteredMatches = mockMatches.filter(match => match.status === activeTab);
 
   const MatchCard = ({ match }: { match: Match }) => (
@@ -110,7 +123,7 @@ export default function MatchesScreen() {
           <View style={styles.opponentDetails}>
             <Text style={styles.opponentName}>{match.opponent.username}</Text>
             <View style={styles.matchMeta}>
-              <Trophy size={16} color="#F97316" />
+              <Text style={styles.sportEmoji}>{getSportEmoji(match.sport)}</Text>
               <Text style={styles.sportText}>{match.sport}</Text>
             </View>
           </View>
@@ -401,11 +414,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  sportEmoji: {
+    fontSize: 16,
+    marginRight: 6,
+  },
   sportText: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
     color: '#64748B',
-    marginLeft: 6,
   },
   matchDetails: {
     marginBottom: 16,
