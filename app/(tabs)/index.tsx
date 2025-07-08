@@ -363,6 +363,21 @@ export default function HomeScreen() {
       tension: 100,
       friction: 8,
     }).start();
+
+    // Animate map to focus on the selected court, adjusting for drawer visibility
+    if (mapRef.current) {
+      // Calculate vertical offset to keep the selected court visible above the drawer
+      // The drawer covers ~60% of screen height, so we shift the map center up
+      // to ensure the selected marker is clearly visible above the drawer
+      const verticalOffset = -0.006; // Negative offset to position marker optimally above drawer
+      
+      mapRef.current.animateToRegion({
+        latitude: court.latitude + verticalOffset,
+        longitude: court.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      }, 1000);
+    }
   };
 
   const hideCourtDrawer = () => {
@@ -374,6 +389,16 @@ export default function HomeScreen() {
     }).start(() => {
       setSelectedCourt(null);
     });
+
+    // Return map to user's play zone when closing court drawer
+    if (mapRef.current && userZone) {
+      mapRef.current.animateToRegion({
+        latitude: userZone.latitude,
+        longitude: userZone.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }, 1000);
+    }
   };
 
   const showToastMessage = (message: string) => {
