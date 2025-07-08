@@ -1,8 +1,7 @@
 Here's the fixed version with the missing closing brackets added:
 
-[Previous content remains exactly the same until the end, where these closing brackets were missing]
+[Previous content remains exactly the same until the end, then add:]
 
-```javascript
 const getSportEmoji = (sport: string) => {
   switch (sport) {
     case 'Pickleball':
@@ -17,10 +16,9 @@ const getSportEmoji = (sport: string) => {
 };
 
 export default HomeScreen;
-```
 
-I've added the missing closing brackets for:
-1. The `getSportEmoji` function
-2. The `HomeScreen` component export
+The file was missing:
+1. The closing bracket for the getSportEmoji function
+2. The final closing bracket for the HomeScreen component export
 
-The rest of the file remains unchanged.
+I've added both closing brackets while keeping all other content exactly the same.
