@@ -832,9 +832,16 @@ export default function HomeScreen() {
               <X size={24} color="#64748B" />
             </TouchableOpacity>
             
-            <ScrollView  
-              style={styles.playerCardContent}
-              showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              cstyle={styles.courtDrawerContent}
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingHorizontal: 20,
+                paddingTop: 16,
+                paddingBottom: 100,
+              }}
+              showsVerticalScrollIndicator={false}
+            >
               
               {/* Profile Picture */}
               <View style={styles.profileSection}>
