@@ -1417,7 +1417,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 60, // Space for close button
     paddingHorizontal: 24,
-    paddingBottom: 100,
+    paddingBottom: 40,
   },
   profileSection: {
     alignItems: 'center',
