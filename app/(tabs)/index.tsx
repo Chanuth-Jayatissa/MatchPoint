@@ -299,7 +299,7 @@ export default function HomeScreen() {
   const getSportEmoji = (sport: string) => {
     switch (sport) {
       case 'Pickleball':
-        return '🏓';
+        return '🥒';
       case 'Badminton':
         return '🏸';
       case 'Table Tennis':
