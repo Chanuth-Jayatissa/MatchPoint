@@ -786,7 +786,7 @@ export default function HomeScreen() {
             <View style={styles.courtSports}>
               {selectedCourt.sports.map((sport, index) => (
                 <View key={index} style={styles.sportChip}>
-                  <Text style={styles.sportEmoji}>{getSportEmoji(sport)}</Text>
+                  <Text style={styles.sportEmoji}>{getSportIcon(sport)}</Text>
                   <Text style={styles.sportChipText}>{sport}</Text>
                 </View>
               ))}
