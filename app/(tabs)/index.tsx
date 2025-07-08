@@ -814,7 +814,7 @@ export default function HomeScreen() {
           style={[
             styles.playerCardOverlay,
             {
-              opacity: playerCardAnimation,
+              //opacity: playerCardAnimation,
               transform: [{
                 translateY: playerCardAnimation.interpolate({
                   inputRange: [0, 1],
