@@ -369,13 +369,13 @@ export default function HomeScreen() {
       // Calculate vertical offset to keep the selected court visible above the drawer
       // The drawer covers ~60% of screen height, so we shift the map center up
       // to ensure the selected marker is clearly visible above the drawer
-      const verticalOffset = -0.0085; // Negative offset to position marker optimally above drawer
+      const verticalOffset = -0.004; // Reduced offset for better court marker visibility
       
       mapRef.current.animateToRegion({
         latitude: court.latitude + verticalOffset,
         longitude: court.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
+        latitudeDelta: 0.015,
+        longitudeDelta: 0.015,
       }, 1000);
     }
   };
