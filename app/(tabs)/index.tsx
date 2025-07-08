@@ -925,16 +925,13 @@ export default function HomeScreen() {
         onRequestClose={() => setFiltersVisible(false)}
       >
         <View style={styles.modalOverlay}>
-              <View style={styles.drawerHandle} />
-              <View style={styles.playerCardHeader}>
-                <Text style={styles.drawerTitle}>Player Details</Text>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={hidePlayerCard}
-                >
-                  <X size={24} color="#64748B" />
-                </TouchableOpacity>
-              </View>
+          <View style={styles.filtersModal}>
+            <View style={styles.drawerHandle} />
+            <View style={styles.filtersHeader}>
+              <Text style={styles.filtersTitle}>Filters</Text>
+              <TouchableOpacity onPress={() => setFiltersVisible(false)}>
+                <X size={24} color="#64748B" />
+              </TouchableOpacity>
             </View>
             
             <View style={styles.filtersDivider} />
@@ -997,6 +994,7 @@ export default function HomeScreen() {
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
+          </View>
         </View>
       </Modal>
 
