@@ -121,6 +121,8 @@ export default function ProfileScreen() {
       <View style={styles.matchHeader}>
         <View style={styles.matchInfo}>
           <View style={styles.matchOpponentRow}>
+            <Text style={styles.matchOpponent}>{match.opponent}</Text>
+          </View>
         </View>
         <View style={styles.matchResult}>
           <Text style={[
