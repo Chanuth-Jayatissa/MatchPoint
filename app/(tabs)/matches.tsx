@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   tabScrollContainer: {
-    marginTop: 16,
+    marginTop: 0,
   },
   tabContainer: {
     paddingHorizontal: 20,
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
   matchesList: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 0,
   },
   matchCard: {
     backgroundColor: '#FFFFFF',
