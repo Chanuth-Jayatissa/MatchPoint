@@ -432,7 +432,7 @@ export default function MatchesScreen() {
         horizontal 
         showsHorizontalScrollIndicator={false}
         style={styles.tabScrollContainer}
-        contentContainerStyle={{ flexDirection: 'row', paddingHorizontal: 20 }}
+        contentContainerStyle={{ flexDirection: 'row', paddingHorizontal: 20, alignItems: 'center' }}
       >
         {[
           { key: 'accept', label: 'Accept', count: mockMatches.filter(m => m.status === 'accept').length },
