@@ -428,42 +428,44 @@ export default function MatchesScreen() {
       </View>
 
       {/* Tab Navigation */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabScrollContainer}
-        contentContainerStyle={{ flexDirection: 'row', paddingHorizontal: 20, alignItems: 'center' }}
-      >
-        {[
-          { key: 'accept', label: 'Accept', count: mockMatches.filter(m => m.status === 'accept').length },
-          { key: 'to-log', label: 'To Log', count: mockMatches.filter(m => m.status === 'to-log').length },
-          { key: 'to-verify', label: 'To Verify', count: mockMatches.filter(m => m.status === 'to-verify').length },
-          { key: 'disputed', label: 'Disputes', count: mockMatches.filter(m => m.status === 'disputed').length },
-        ].map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[
-              styles.tab,
-              activeTab === tab.key && styles.activeTab
-            ]}
-            onPress={() => setActiveTab(tab.key as any)}
-          >
-            <Text style={[
-              styles.tabText,
-              activeTab === tab.key && styles.activeTabText
-            ]}>
-              {tab.label}
-            </Text>
-            {tab.count > 0 && (
-              <View style={styles.tabBadge}>
-                <Text style={styles.tabBadgeText}>
-                  {tab.count}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.tabRowWrapper}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.tabScrollView}
+          contentContainerStyle={styles.tabScrollContent}
+        >
+          {[
+            { key: 'accept', label: 'Accept', count: mockMatches.filter(m => m.status === 'accept').length },
+            { key: 'to-log', label: 'Log', count: mockMatches.filter(m => m.status === 'to-log').length },
+            { key: 'to-verify', label: 'Verify', count: mockMatches.filter(m => m.status === 'to-verify').length },
+            { key: 'disputed', label: 'Disputes', count: mockMatches.filter(m => m.status === 'disputed').length },
+          ].map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[
+                styles.tab,
+                activeTab === tab.key && styles.activeTab
+              ]}
+              onPress={() => setActiveTab(tab.key as any)}
+            >
+              <Text style={[
+                styles.tabText,
+                activeTab === tab.key && styles.activeTabText
+              ]}>
+                {tab.label}
+              </Text>
+              {tab.count > 0 && (
+                <View style={styles.tabBadge}>
+                  <Text style={styles.tabBadgeText}>
+                    {tab.count}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       {/* Matches List */}
       <ScrollView style={styles.matchesList} showsVerticalScrollIndicator={false}>
@@ -581,7 +583,16 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   tabScrollContainer: {
-    marginTop: 0,
+    marginTop: 16,
+  },
+  tabRowWrapper: {
+    paddingHorizontal: 20,
+    flexShrink: 1,
+  },
+  tabScrollView: {},
+  tabScrollContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tabContainer: {
     paddingHorizontal: 20,
@@ -630,7 +641,7 @@ const styles = StyleSheet.create({
   matchesList: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 0,
+    paddingTop: 16,
   },
   matchCard: {
     backgroundColor: '#FFFFFF',
