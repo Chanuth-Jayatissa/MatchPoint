@@ -595,11 +595,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     marginRight: 12,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#F8FAFC',
     borderWidth: 0,
   },
   activeTab: {
-    backgroundColor: '#FF0000',
+    backgroundColor: '#2563EB',
     borderColor: 'transparent',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
