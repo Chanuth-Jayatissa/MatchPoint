@@ -420,6 +420,21 @@ export default function MatchesScreen() {
     }
   };
 
+  const getBadgeColor = (tabKey: string) => {
+    switch (tabKey) {
+      case 'accept':
+        return '#F97316';
+      case 'to-log':
+        return '#F59E0B';
+      case 'to-verify':
+        return '#10B981';
+      case 'disputed':
+        return '#EF4444';
+      default:
+        return '#64748B';
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -428,43 +443,49 @@ export default function MatchesScreen() {
       </View>
 
       {/* Tab Navigation */}
-      <View style={styles.tabRowWrapper}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          style={styles.tabScrollView}
-          contentContainerStyle={styles.tabScrollContent}
-        >
+      <View style={styles.tabContainer}>
+        <View style={styles.tabBar}>
           {[
-            { key: 'accept', label: 'Accept', count: mockMatches.filter(m => m.status === 'accept').length },
-            { key: 'to-log', label: 'Log', count: mockMatches.filter(m => m.status === 'to-log').length },
-            { key: 'to-verify', label: 'Verify', count: mockMatches.filter(m => m.status === 'to-verify').length },
-            { key: 'disputed', label: 'Disputes', count: mockMatches.filter(m => m.status === 'disputed').length },
+            { key: 'accept', label: 'Accept', icon: Zap, count: mockMatches.filter(m => m.status === 'accept').length },
+            { key: 'to-log', label: 'Log', icon: Clock, count: mockMatches.filter(m => m.status === 'to-log').length },
+            { key: 'to-verify', label: 'Verify', icon: CheckCircle, count: mockMatches.filter(m => m.status === 'to-verify').length },
+            { key: 'disputed', label: 'Dispute', icon: AlertTriangle, count: mockMatches.filter(m => m.status === 'disputed').length },
           ].map((tab) => (
             <TouchableOpacity
               key={tab.key}
               style={[
-                styles.tab,
-                activeTab === tab.key && styles.activeTab
+                styles.modernTab,
+                activeTab === tab.key && styles.activeModernTab
               ]}
               onPress={() => setActiveTab(tab.key as any)}
+              activeOpacity={0.7}
             >
-              <Text style={[
-                styles.tabText,
-                activeTab === tab.key && styles.activeTabText
-              ]}>
-                {tab.label}
-              </Text>
-              {tab.count > 0 && (
-                <View style={styles.tabBadge}>
-                  <Text style={styles.tabBadgeText}>
-                    {tab.count}
-                  </Text>
-                </View>
-              )}
+              <View style={styles.tabContent}>
+                <tab.icon 
+                  size={16} 
+                  color={activeTab === tab.key ? '#FFFFFF' : '#64748B'} 
+                  strokeWidth={2}
+                />
+                <Text style={[
+                  styles.modernTabText,
+                  activeTab === tab.key && styles.activeModernTabText
+                ]}>
+                  {tab.label}
+                </Text>
+                {tab.count > 0 && (
+                  <View style={[
+                    styles.modernTabBadge,
+                    { backgroundColor: getBadgeColor(tab.key) }
+                  ]}>
+                    <Text style={styles.modernTabBadgeText}>
+                      {tab.count}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
       </View>
 
       {/* Matches List */}
@@ -585,22 +606,74 @@ const styles = StyleSheet.create({
   tabScrollContainer: {
     marginTop: 16,
   },
-  tabRowWrapper: {
+  tabContainer: {
+    backgroundColor: '#F8FAFC',
     paddingHorizontal: 20,
-    flexShrink: 1,
     paddingTop: 20,
     paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
   },
-  tabScrollView: {},
-  tabScrollContent: {
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  modernTab: {
+    flex: 1,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    marginHorizontal: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+  },
+  activeModernTab: {
+    backgroundColor: '#1D4ED8',
+    shadowColor: '#1D4ED8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tabContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  tabContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 0,
-    flexDirection: 'row',
+  modernTabText: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#64748B',
+    marginLeft: 4,
+    textAlign: 'center',
   },
+  activeModernTabText: {
+    color: '#FFFFFF',
+  },
+  modernTabBadge: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    marginLeft: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  modernTabBadgeText: {
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    color: '#FFFFFF',
+  },
+  // Legacy styles - can be removed
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
