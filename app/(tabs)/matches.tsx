@@ -420,21 +420,6 @@ export default function MatchesScreen() {
     }
   };
 
-  const getTabColor = (tabKey: string) => {
-    switch (tabKey) {
-      case 'accept':
-        return '#F97316';
-      case 'to-log':
-        return '#F97316';
-      case 'to-verify':
-        return '#10B981';
-      case 'disputed':
-        return '#EF4444';
-      default:
-        return '#64748B';
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -459,8 +444,7 @@ export default function MatchesScreen() {
             key={tab.key}
             style={[
               styles.tab,
-              activeTab === tab.key && styles.activeTab,
-              activeTab === tab.key && { backgroundColor: getTabColor(tab.key) }
+              activeTab === tab.key && styles.activeTab
             ]}
             onPress={() => setActiveTab(tab.key as any)}
           >
@@ -471,14 +455,8 @@ export default function MatchesScreen() {
               {tab.label}
             </Text>
             {tab.count > 0 && (
-              <View style={[
-                styles.tabBadge,
-                { backgroundColor: activeTab === tab.key ? 'rgba(255,255,255,0.3)' : getTabColor(tab.key) }
-              ]}>
-                <Text style={[
-                  styles.tabBadgeText,
-                  { color: activeTab === tab.key ? '#FFFFFF' : '#FFFFFF' }
-                ]}>
+              <View style={styles.tabBadge}>
+                <Text style={styles.tabBadgeText}>
                   {tab.count}
                 </Text>
               </View>
@@ -614,7 +592,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     borderRadius: 20,
     marginRight: 12,
     backgroundColor: '#F8FAFC',
@@ -622,8 +600,8 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   activeTab: {
-    backgroundColor: '#F97316',
-    borderColor: '#F97316',
+    backgroundColor: '#1D4ED8',
+    borderColor: '#1D4ED8',
     borderColor: 'transparent',
   },
   tabText: {
@@ -641,6 +619,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F97316',
   },
   tabBadgeText: {
     fontSize: 12,
