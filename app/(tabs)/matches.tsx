@@ -588,6 +588,7 @@ const styles = StyleSheet.create({
   tabRowWrapper: {
     paddingHorizontal: 20,
     flexShrink: 1,
+    paddingVertical: 12,
   },
   tabScrollView: {},
   tabScrollContent: {
