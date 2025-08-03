@@ -10,7 +10,7 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Trophy, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X, User, MapPin, Calendar } from 'lucide-react-native';
+import { Trophy, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X, User, MapPin, Calendar, Zap } from 'lucide-react-native';
 
 interface Match {
   id: string;
@@ -19,11 +19,19 @@ interface Match {
     profilePic: string;
   };
   sport: string;
-  court: string;
-  status: 'to-log' | 'to-verify' | 'disputed';
+  court: {
+    name: string;
+    location: string;
+  };
+  status: 'accept' | 'to-log' | 'to-verify' | 'disputed';
   timestamp: string;
   score?: string;
   result?: 'win' | 'loss';
+  acceptanceStatus: {
+    userAccepted: boolean;
+    opponentAccepted: boolean;
+    courtChanged: boolean;
+  };
 }
 
 const mockMatches: Match[] = [
@@ -34,9 +42,17 @@ const mockMatches: Match[] = [
       profilePic: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
     },
     sport: 'Pickleball',
-    court: 'Downtown Pickleball Court #1',
-    status: 'to-log',
+    court: {
+      name: 'Downtown Pickleball Court #1',
+      location: 'Downtown Sports Complex',
+    },
+    status: 'accept',
     timestamp: '2 hours ago',
+    acceptanceStatus: {
+      userAccepted: false,
+      opponentAccepted: true,
+      courtChanged: false,
+    },
   },
   {
     id: '2',
@@ -45,29 +61,102 @@ const mockMatches: Match[] = [
       profilePic: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
     },
     sport: 'Badminton',
-    court: 'University Gym Court B',
-    status: 'to-verify',
-    timestamp: '1 day ago',
-    score: '21-17, 19-21, 21-15',
-    result: 'win',
+    court: {
+      name: 'University Badminton Hall',
+      location: 'University Recreation Center',
+    },
+    status: 'accept',
+    timestamp: '4 hours ago',
+    acceptanceStatus: {
+      userAccepted: true,
+      opponentAccepted: false,
+      courtChanged: false,
+    },
   },
   {
     id: '3',
+    opponent: {
+      username: 'CourtCrusher',
+      profilePic: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    },
+    sport: 'Pickleball',
+    court: {
+      name: 'Elite Pickleball Academy Court A',
+      location: 'Downtown Sports Complex',
+    },
+    status: 'accept',
+    timestamp: '6 hours ago',
+    acceptanceStatus: {
+      userAccepted: true,
+      opponentAccepted: true,
+      courtChanged: true,
+    },
+  },
+  {
+    id: '4',
     opponent: {
       username: 'PingPongKing',
       profilePic: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
     },
     sport: 'Table Tennis',
-    court: 'Community Center Table 3',
+    court: {
+      name: 'Community Ping Pong Room',
+      location: 'Community Sports Hub',
+    },
+    status: 'to-log',
+    timestamp: '1 day ago',
+    acceptanceStatus: {
+      userAccepted: true,
+      opponentAccepted: true,
+      courtChanged: false,
+    },
+  },
+  {
+    id: '5',
+    opponent: {
+      username: 'NetNinja',
+      profilePic: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    },
+    sport: 'Badminton',
+    court: {
+      name: 'Recreation Center Multi-Court',
+      location: 'University Recreation Center',
+    },
+    status: 'to-verify',
+    timestamp: '2 days ago',
+    score: '21-17, 19-21, 21-15',
+    result: 'win',
+    acceptanceStatus: {
+      userAccepted: true,
+      opponentAccepted: true,
+      courtChanged: false,
+    },
+  },
+  {
+    id: '6',
+    opponent: {
+      username: 'SmashMaster',
+      profilePic: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    },
+    sport: 'Pickleball',
+    court: {
+      name: 'Downtown Pickleball Court #1',
+      location: 'Downtown Sports Complex',
+    },
     status: 'disputed',
     timestamp: '3 days ago',
     score: '11-9, 8-11, 11-7',
     result: 'win',
+    acceptanceStatus: {
+      userAccepted: true,
+      opponentAccepted: true,
+      courtChanged: false,
+    },
   },
 ];
 
 export default function MatchesScreen() {
-  const [activeTab, setActiveTab] = useState<'to-log' | 'to-verify' | 'disputed'>('to-log');
+  const [activeTab, setActiveTab] = useState<'accept' | 'to-log' | 'to-verify' | 'disputed'>('accept');
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [logModalVisible, setLogModalVisible] = useState(false);
   const [score, setScore] = useState('');
@@ -76,6 +165,8 @@ export default function MatchesScreen() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
+      case 'accept':
+        return <Zap size={20} color="#F97316" />;
       case 'to-log':
         return <Clock size={20} color="#F97316" />;
       case 'to-verify':
@@ -87,8 +178,26 @@ export default function MatchesScreen() {
     }
   };
 
-  const getActionButtonText = (status: string) => {
+  const getAcceptanceStatus = (match: Match) => {
+    if (match.acceptanceStatus.courtChanged) {
+      return 'Court changed – confirm to proceed';
+    }
+    if (!match.acceptanceStatus.userAccepted) {
+      return 'Waiting for your acceptance';
+    }
+    if (!match.acceptanceStatus.opponentAccepted) {
+      return 'Waiting for opponent to accept';
+    }
+    return 'Both players accepted';
+  };
+
+  const getActionButtonText = (status: string, match?: Match) => {
     switch (status) {
+      case 'accept':
+        if (match && !match.acceptanceStatus.userAccepted) {
+          return 'Accept Match';
+        }
+        return 'Waiting...';
       case 'to-log':
         return 'Log Result';
       case 'to-verify':
@@ -115,7 +224,7 @@ export default function MatchesScreen() {
 
   const filteredMatches = mockMatches.filter(match => match.status === activeTab);
 
-  const MatchCard = ({ match }: { match: Match }) => (
+  const AcceptMatchCard = ({ match }: { match: Match }) => (
     <View style={styles.matchCard}>
       <View style={styles.matchHeader}>
         <View style={styles.opponentInfo}>
@@ -134,10 +243,126 @@ export default function MatchesScreen() {
       <View style={styles.matchDetails}>
         <View style={styles.detailRow}>
           <MapPin size={16} color="#64748B" />
-          <Text style={styles.detailText}>{match.court}</Text>
+          <Text style={styles.detailText}>{match.court.name}</Text>
         </View>
         <View style={styles.detailRow}>
           <Calendar size={16} color="#64748B" />
+          <Text style={styles.detailText}>{match.court.location}</Text>
+        </View>
+        <View style={styles.statusContainer}>
+          <Text style={styles.statusText}>{getAcceptanceStatus(match)}</Text>
+        </View>
+      </View>
+
+      <View style={styles.actionButtonsRow}>
+        {!match.acceptanceStatus.userAccepted ? (
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: '#F97316', flex: 1, marginRight: 8 }]}
+            onPress={() => {
+              // Handle accept match
+            }}
+          >
+            <Text style={styles.actionButtonText}>Accept Match</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={[styles.disabledButton, { flex: 1, marginRight: 8 }]}>
+            <Text style={styles.disabledButtonText}>Accepted ✓</Text>
+          </View>
+        )}
+        
+        <TouchableOpacity
+          style={[styles.secondaryButton, { flex: 1, marginLeft: 8 }]}
+          onPress={() => {
+            // Handle change court
+          }}
+        >
+          <Text style={styles.secondaryButtonText}>Change Court</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const ToLogMatchCard = ({ match }: { match: Match }) => (
+    <View style={styles.matchCard}>
+      <View style={styles.matchHeader}>
+        <View style={styles.opponentInfo}>
+          <Image source={{ uri: match.opponent.profilePic }} style={styles.opponentAvatar} />
+          <View style={styles.opponentDetails}>
+            <Text style={styles.opponentName}>{match.opponent.username}</Text>
+            <View style={styles.matchMeta}>
+              <Text style={styles.sportEmoji}>{getSportEmoji(match.sport)}</Text>
+              <Text style={styles.sportText}>{match.sport}</Text>
+            </View>
+          </View>
+        </View>
+        {getStatusIcon(match.status)}
+      </View>
+
+      <View style={styles.matchDetails}>
+        <View style={styles.detailRow}>
+          <MapPin size={16} color="#64748B" />
+          <Text style={styles.detailText}>{match.court.name}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Calendar size={16} color="#64748B" />
+          <Text style={styles.detailText}>{match.court.location}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Clock size={16} color="#64748B" />
+          <Text style={styles.detailText}>{match.timestamp}</Text>
+        </View>
+      </View>
+
+      <View style={styles.actionButtonsRow}>
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: '#F97316', flex: 1, marginRight: 8 }]}
+          onPress={() => {
+            setSelectedMatch(match);
+            setLogModalVisible(true);
+          }}
+        >
+          <Text style={styles.actionButtonText}>Log Result</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.secondaryButton, { flex: 1, marginLeft: 8 }]}
+          onPress={() => {
+            // Handle change court - returns to Accept tab
+          }}
+        >
+          <Text style={styles.secondaryButtonText}>Change Court</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const StandardMatchCard = ({ match }: { match: Match }) => (
+    <View style={styles.matchCard}>
+      <View style={styles.matchHeader}>
+        <View style={styles.opponentInfo}>
+          <Image source={{ uri: match.opponent.profilePic }} style={styles.opponentAvatar} />
+          <View style={styles.opponentDetails}>
+            <Text style={styles.opponentName}>{match.opponent.username}</Text>
+            <View style={styles.matchMeta}>
+              <Text style={styles.sportEmoji}>{getSportEmoji(match.sport)}</Text>
+              <Text style={styles.sportText}>{match.sport}</Text>
+            </View>
+          </View>
+        </View>
+        {getStatusIcon(match.status)}
+      </View>
+
+      <View style={styles.matchDetails}>
+        <View style={styles.detailRow}>
+          <MapPin size={16} color="#64748B" />
+          <Text style={styles.detailText}>{match.court.name}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Calendar size={16} color="#64748B" />
+          <Text style={styles.detailText}>{match.court.location}</Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Clock size={16} color="#64748B" />
           <Text style={styles.detailText}>{match.timestamp}</Text>
         </View>
         {match.score && (
@@ -157,19 +382,48 @@ export default function MatchesScreen() {
       <TouchableOpacity
         style={[styles.actionButton, { backgroundColor: getActionButtonColor(match.status) }]}
         onPress={() => {
-          if (match.status === 'to-log') {
-            setSelectedMatch(match);
-            setLogModalVisible(true);
+          if (match.status === 'to-verify') {
+            // Handle verify
+          } else if (match.status === 'disputed') {
+            // Handle view dispute
           }
         }}
       >
-        <Text style={styles.actionButtonText}>{getActionButtonText(match.status)}</Text>
+        <Text style={styles.actionButtonText}>{getActionButtonText(match.status, match)}</Text>
       </TouchableOpacity>
     </View>
   );
 
+  const renderMatchCard = (match: Match) => {
+    switch (match.status) {
+      case 'accept':
+        return <AcceptMatchCard key={match.id} match={match} />;
+      case 'to-log':
+        return <ToLogMatchCard key={match.id} match={match} />;
+      default:
+        return <StandardMatchCard key={match.id} match={match} />;
+    }
+  };
+
   const getActionButtonColor = (status: string) => {
     switch (status) {
+      case 'accept':
+        return '#F97316';
+      case 'to-log':
+        return '#F97316';
+      case 'to-verify':
+        return '#10B981';
+      case 'disputed':
+        return '#EF4444';
+      default:
+        return '#64748B';
+    }
+  };
+
+  const getTabColor = (tabKey: string) => {
+    switch (tabKey) {
+      case 'accept':
+        return '#F97316';
       case 'to-log':
         return '#F97316';
       case 'to-verify':
@@ -189,8 +443,14 @@ export default function MatchesScreen() {
       </View>
 
       {/* Tab Navigation */}
-      <View style={styles.tabContainer}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabScrollContainer}
+        contentContainerStyle={styles.tabContainer}
+      >
         {[
+          { key: 'accept', label: 'Accept', count: mockMatches.filter(m => m.status === 'accept').length },
           { key: 'to-log', label: 'To Log', count: mockMatches.filter(m => m.status === 'to-log').length },
           { key: 'to-verify', label: 'To Verify', count: mockMatches.filter(m => m.status === 'to-verify').length },
           { key: 'disputed', label: 'Disputes', count: mockMatches.filter(m => m.status === 'disputed').length },
@@ -199,7 +459,8 @@ export default function MatchesScreen() {
             key={tab.key}
             style={[
               styles.tab,
-              activeTab === tab.key && styles.activeTab
+              activeTab === tab.key && styles.activeTab,
+              activeTab === tab.key && { backgroundColor: getTabColor(tab.key) }
             ]}
             onPress={() => setActiveTab(tab.key as any)}
           >
@@ -210,28 +471,43 @@ export default function MatchesScreen() {
               {tab.label}
             </Text>
             {tab.count > 0 && (
-              <View style={styles.tabBadge}>
-                <Text style={styles.tabBadgeText}>{tab.count}</Text>
+              <View style={[
+                styles.tabBadge,
+                { backgroundColor: activeTab === tab.key ? 'rgba(255,255,255,0.3)' : getTabColor(tab.key) }
+              ]}>
+                <Text style={[
+                  styles.tabBadgeText,
+                  { color: activeTab === tab.key ? '#FFFFFF' : '#FFFFFF' }
+                ]}>
+                  {tab.count}
+                </Text>
               </View>
             )}
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       {/* Matches List */}
       <ScrollView style={styles.matchesList} showsVerticalScrollIndicator={false}>
         {filteredMatches.length > 0 ? (
-          filteredMatches.map((match) => (
-            <MatchCard key={match.id} match={match} />
-          ))
+          filteredMatches.map((match) => renderMatchCard(match))
         ) : (
           <View style={styles.emptyState}>
             <Trophy size={48} color="#D1D5DB" />
-            <Text style={styles.emptyStateText}>No matches to {activeTab.replace('-', ' ')}</Text>
+            <Text style={styles.emptyStateText}>
+              {activeTab === 'accept' && 'No matches to accept'}
+              {activeTab === 'to-log' && 'No matches to log'}
+              {activeTab === 'to-verify' && 'No matches to verify'}
+              {activeTab === 'disputed' && 'No disputed matches'}
+            </Text>
             <Text style={styles.emptyStateSubtext}>
-              {activeTab === 'to-log' 
-                ? 'Play some matches to see them here' 
-                : 'All caught up!'}
+              {activeTab === 'accept' 
+                ? 'Challenge players to see matches here' 
+                : activeTab === 'to-log'
+                ? 'Accept challenges to log results'
+                : activeTab === 'to-verify'
+                ? 'Log match results to verify them'
+                : 'All disputes resolved!'}
             </Text>
           </View>
         )}
@@ -257,7 +533,7 @@ export default function MatchesScreen() {
               {selectedMatch && (
                 <View style={styles.matchInfo}>
                   <Text style={styles.modalLabel}>Match with {selectedMatch.opponent.username}</Text>
-                  <Text style={styles.modalSubtext}>{selectedMatch.sport} • {selectedMatch.court}</Text>
+                  <Text style={styles.modalSubtext}>{selectedMatch.sport} • {selectedMatch.court.name}</Text>
                 </View>
               )}
 
@@ -326,25 +602,28 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     color: '#0F172A',
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F8FAFC',
-    marginHorizontal: 20,
+  tabScrollContainer: {
     marginTop: 16,
-    borderRadius: 12,
-    padding: 4,
+    marginHorizontal: 20,
+  },
+  tabContainer: {
+    paddingHorizontal: 4,
   },
   tab: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
+    marginRight: 8,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    minWidth: 80,
   },
   activeTab: {
-    backgroundColor: '#1D4ED8',
+    borderColor: 'transparent',
   },
   tabText: {
     fontSize: 14,
@@ -355,7 +634,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   tabBadge: {
-    backgroundColor: '#F97316',
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -364,7 +642,6 @@ const styles = StyleSheet.create({
   tabBadgeText: {
     fontSize: 12,
     fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
   },
   matchesList: {
     flex: 1,
@@ -437,6 +714,18 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginLeft: 8,
   },
+  statusContainer: {
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 8,
+  },
+  statusText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#0F172A',
+    textAlign: 'center',
+  },
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -461,6 +750,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-Bold',
   },
+  actionButtonsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   actionButton: {
     borderRadius: 12,
     paddingVertical: 12,
@@ -471,6 +764,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
+  },
+  secondaryButton: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+  },
+  secondaryButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#64748B',
+  },
+  disabledButton: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+  },
+  disabledButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#10B981',
   },
   emptyState: {
     flex: 1,
