@@ -595,11 +595,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     marginRight: 12,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#E0E0E0',
     borderWidth: 0,
   },
   activeTab: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#FF0000',
     borderColor: 'transparent',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -626,11 +626,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F97316',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
-  },
-  tabBadgeText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
   },
   matchesList: {
     flex: 1,
