@@ -591,18 +591,21 @@ const styles = StyleSheet.create({
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 20,
     marginRight: 12,
     backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderWidth: 0,
   },
   activeTab: {
-    backgroundColor: '#1D4ED8',
-    borderColor: '#1D4ED8',
+    backgroundColor: '#2563EB',
     borderColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 5,
   },
   tabText: {
     fontSize: 14,
@@ -610,6 +613,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   activeTabText: {
+    fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
   },
   tabBadge: {
@@ -620,6 +624,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F97316',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
   tabBadgeText: {
     fontSize: 12,
