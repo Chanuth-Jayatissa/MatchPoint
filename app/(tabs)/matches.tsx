@@ -608,12 +608,13 @@ const styles = StyleSheet.create({
   tabContainer: {
     paddingHorizontal: 20,
     paddingVertical: 0,
+    flexDirection: 'row',
   },
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRadius: 20,
     marginRight: 12,
     backgroundColor: '#F8FAFC',
