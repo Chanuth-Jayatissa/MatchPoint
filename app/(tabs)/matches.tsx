@@ -12,14 +12,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trophy, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X, User, MapPin, Calendar, Zap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  interpolate,
-  Extrapolate 
-} from 'react-native-reanimated';
-import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 interface Match {
@@ -173,20 +165,6 @@ export default function MatchesScreen() {
   const [comment, setComment] = useState('');
   const [reportIssue, setReportIssue] = useState(false);
 
-  // Animation values for each tab
-  const acceptAnimation = useSharedValue(1);
-  const logAnimation = useSharedValue(0);
-  const verifyAnimation = useSharedValue(0);
-  const disputeAnimation = useSharedValue(0);
-
-  useEffect(() => {
-    // Reset all animations
-    acceptAnimation.value = withTiming(activeTab === 'accept' ? 1 : 0, { duration: 300 });
-    logAnimation.value = withTiming(activeTab === 'to-log' ? 1 : 0, { duration: 300 });
-    verifyAnimation.value = withTiming(activeTab === 'to-verify' ? 1 : 0, { duration: 300 });
-    disputeAnimation.value = withTiming(activeTab === 'disputed' ? 1 : 0, { duration: 300 });
-  }, [activeTab]);
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'accept':
@@ -248,108 +226,39 @@ export default function MatchesScreen() {
 
   const filteredMatches = mockMatches.filter(match => match.status === activeTab);
 
-  const AnimatedTab = ({ 
+  const StaticTab = ({ 
     tabKey, 
     icon: IconComponent, 
-    label, 
-    count, 
-    animationValue, 
-    gradientColors 
+    label,
+    backgroundColor
   }: {
     tabKey: string;
     icon: any;
     label: string;
-    count: number;
-    animationValue: Animated.SharedValue<number>;
-    gradientColors: string[];
+    backgroundColor: string;
   }) => {
-    const animatedStyle = useAnimatedStyle(() => {
-      const isActive = animationValue.value > 0;
-      
-      return {
-        width: withTiming(
-          interpolate(
-            animationValue.value,
-            [0, 1],
-            [44, 80], // Expand from icon-only to icon+label
-            Extrapolate.CLAMP
-          ),
-          { duration: 300 }
-        ),
-        transform: [
-          {
-            scale: withTiming(
-              interpolate(
-                animationValue.value,
-                [0, 1],
-                [1, 1.02],
-                Extrapolate.CLAMP
-              ),
-              { duration: 300 }
-            )
-          }
-        ],
-      };
-    });
-
-    const textAnimatedStyle = useAnimatedStyle(() => {
-      return {
-        opacity: withTiming(animationValue.value, { duration: 200 }),
-        transform: [
-          {
-            translateX: withTiming(
-              interpolate(
-                animationValue.value,
-                [0, 1],
-                [10, 0],
-                Extrapolate.CLAMP
-              ),
-              { duration: 300 }
-            )
-          }
-        ],
-      };
-    });
-
     const isActive = activeTab === tabKey;
 
     return (
       <TouchableOpacity
         onPress={() => setActiveTab(tabKey as any)}
         activeOpacity={0.8}
-        style={styles.fluidTab}
+        style={[
+          styles.staticTab,
+          isActive && styles.activeStaticTab,
+          isActive && { backgroundColor }
+        ]}
       >
-        <Animated.View style={[styles.fluidTabInner, animatedStyle]}>
-          {isActive ? (
-            <LinearGradient
-              colors={gradientColors}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.activeTabGradient}
-            >
-              <View style={styles.fluidTabContent}>
-                <IconComponent 
-                  size={18} 
-                  color="#FFFFFF"
-                  strokeWidth={2.5}
-                />
-                <Animated.View style={[styles.labelContainer, textAnimatedStyle]}>
-                  <Animated.Text style={styles.activeFluidTabText}>
-                    {label}
-                  </Animated.Text>
-                </Animated.View>
-              </View>
-            </LinearGradient>
-          ) : (
-            <View style={styles.inactiveFluidTab}>
-              <IconComponent 
-                size={18} 
-                color="#64748B"
-                strokeWidth={2}
-              />
-            </View>
-          )}
-        </Animated.View>
+        <IconComponent 
+          size={18} 
+          color={isActive ? "#FFFFFF" : "#64748B"}
+          strokeWidth={2}
+        />
+        {isActive && (
+          <Text style={styles.staticTabLabel}>
+            {label}
+          </Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -588,39 +497,31 @@ export default function MatchesScreen() {
       </View>
 
       {/* Tab Navigation */}
-      <View style={styles.fluidTabContainer}>
-        <View style={styles.fluidTabStrip}>
-          <AnimatedTab
+      <View style={styles.staticTabContainer}>
+        <View style={styles.staticTabStrip}>
+          <StaticTab
             tabKey="accept"
             icon={Zap}
             label="Accept"
-            count={mockMatches.filter(m => m.status === 'accept').length}
-            animationValue={acceptAnimation}
-            gradientColors={['#facc15', '#fbbf24']}
+            backgroundColor="#facc15"
           />
-          <AnimatedTab
+          <StaticTab
             tabKey="to-log"
             icon={Clock}
             label="Log"
-            count={mockMatches.filter(m => m.status === 'to-log').length}
-            animationValue={logAnimation}
-            gradientColors={['#f97316', '#fb923c']}
+            backgroundColor="#f97316"
           />
-          <AnimatedTab
+          <StaticTab
             tabKey="to-verify"
             icon={CheckCircle}
             label="Verify"
-            count={mockMatches.filter(m => m.status === 'to-verify').length}
-            animationValue={verifyAnimation}
-            gradientColors={['#10b981', '#34d399']}
+            backgroundColor="#10b981"
           />
-          <AnimatedTab
+          <StaticTab
             tabKey="disputed"
             icon={AlertTriangle}
             label="Dispute"
-            count={mockMatches.filter(m => m.status === 'disputed').length}
-            animationValue={disputeAnimation}
-            gradientColors={['#ef4444', '#f87171']}
+            backgroundColor="#ef4444"
           />
         </View>
       </View>
@@ -740,6 +641,53 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     color: '#0F172A',
   },
+  staticTabContainer: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  staticTabStrip: {
+    flexDirection: 'row',
+    backgroundColor: '#f8fafc',
+    borderRadius: 20,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  staticTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 16,
+    backgroundColor: 'transparent',
+    minHeight: 44,
+  },
+  activeStaticTab: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  staticTabLabel: {
+    fontSize: 13,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+    marginLeft: 6,
+    letterSpacing: 0.3,
+  },
+  // Legacy styles for backwards compatibility
   fluidTabContainer: {
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 20,
@@ -815,7 +763,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  // Legacy styles for backwards compatibility
   tabContainer: {
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 20,
