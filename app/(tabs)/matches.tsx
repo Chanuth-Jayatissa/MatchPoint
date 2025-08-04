@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trophy, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X, User, MapPin, Calendar, Zap } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import { Platform } from 'react-native';
 
 interface Match {
   id: string;
@@ -435,6 +438,21 @@ export default function MatchesScreen() {
     }
   };
 
+  const getBadgeRGB = (tabKey: string) => {
+    switch (tabKey) {
+      case 'accept':
+        return '249, 115, 22'; // #F97316
+      case 'to-log':
+        return '245, 158, 11'; // #F59E0B
+      case 'to-verify':
+        return '16, 185, 129'; // #10B981
+      case 'disputed':
+        return '239, 68, 68'; // #EF4444
+      default:
+        return '100, 116, 139'; // #64748B
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -444,48 +462,149 @@ export default function MatchesScreen() {
 
       {/* Tab Navigation */}
       <View style={styles.tabContainer}>
-        <View style={styles.tabBar}>
-          {[
-            { key: 'accept', label: 'Accept', icon: Zap, count: mockMatches.filter(m => m.status === 'accept').length },
-            { key: 'to-log', label: 'Log', icon: Clock, count: mockMatches.filter(m => m.status === 'to-log').length },
-            { key: 'to-verify', label: 'Verify', icon: CheckCircle, count: mockMatches.filter(m => m.status === 'to-verify').length },
-            { key: 'disputed', label: 'Dispute', icon: AlertTriangle, count: mockMatches.filter(m => m.status === 'disputed').length },
-          ].map((tab) => (
-            <TouchableOpacity
-              key={tab.key}
-              style={[
-                styles.modernTab,
-                activeTab === tab.key && styles.activeModernTab
-              ]}
-              onPress={() => setActiveTab(tab.key as any)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.tabContent}>
-                <tab.icon 
-                  size={16} 
-                  color={activeTab === tab.key ? '#FFFFFF' : '#64748B'} 
-                  strokeWidth={2}
-                />
-                <Text style={[
-                  styles.modernTabText,
-                  activeTab === tab.key && styles.activeModernTabText
-                ]}>
-                  {tab.label}
-                </Text>
-                {tab.count > 0 && (
-                  <View style={[
-                    styles.modernTabBadge,
-                    { backgroundColor: getBadgeColor(tab.key) }
-                  ]}>
-                    <Text style={styles.modernTabBadgeText}>
-                      {tab.count}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {Platform.OS === 'ios' ? (
+          <BlurView intensity={20} tint="light" style={styles.glassmorphismContainer}>
+            <View style={styles.tabBar}>
+              {[
+                { key: 'accept', label: 'Accept', icon: Zap, count: mockMatches.filter(m => m.status === 'accept').length },
+                { key: 'to-log', label: 'Log', icon: Clock, count: mockMatches.filter(m => m.status === 'to-log').length },
+                { key: 'to-verify', label: 'Verify', icon: CheckCircle, count: mockMatches.filter(m => m.status === 'to-verify').length },
+                { key: 'disputed', label: 'Dispute', icon: AlertTriangle, count: mockMatches.filter(m => m.status === 'disputed').length },
+              ].map((tab) => (
+                <TouchableOpacity
+                  key={tab.key}
+                  style={styles.premiumTab}
+                  onPress={() => setActiveTab(tab.key as any)}
+                  activeOpacity={0.8}
+                >
+                  {activeTab === tab.key ? (
+                    <LinearGradient
+                      colors={['#3B82F6', '#60A5FA']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.activeTabGradient}
+                    >
+                      <View style={styles.tabContent}>
+                        <tab.icon 
+                          size={16} 
+                          color="#FFFFFF"
+                          strokeWidth={2.5}
+                        />
+                        <Text style={styles.activeTabText}>
+                          {tab.label}
+                        </Text>
+                        {tab.count > 0 && (
+                          <View style={[
+                            styles.premiumBadge,
+                            { backgroundColor: `rgba(${getBadgeRGB(tab.key)}, 0.9)` }
+                          ]}>
+                            <Text style={styles.premiumBadgeText}>
+                              {tab.count}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </LinearGradient>
+                  ) : (
+                    <View style={styles.inactiveTab}>
+                      <View style={styles.tabContent}>
+                        <tab.icon 
+                          size={16} 
+                          color="#64748B"
+                          strokeWidth={2}
+                        />
+                        <Text style={styles.inactiveTabText}>
+                          {tab.label}
+                        </Text>
+                        {tab.count > 0 && (
+                          <View style={[
+                            styles.premiumBadge,
+                            { backgroundColor: `rgba(${getBadgeRGB(tab.key)}, 0.9)` }
+                          ]}>
+                            <Text style={styles.premiumBadgeText}>
+                              {tab.count}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </BlurView>
+        ) : (
+          <View style={styles.androidGlassContainer}>
+            <View style={styles.tabBar}>
+              {[
+                { key: 'accept', label: 'Accept', icon: Zap, count: mockMatches.filter(m => m.status === 'accept').length },
+                { key: 'to-log', label: 'Log', icon: Clock, count: mockMatches.filter(m => m.status === 'to-log').length },
+                { key: 'to-verify', label: 'Verify', icon: CheckCircle, count: mockMatches.filter(m => m.status === 'to-verify').length },
+                { key: 'disputed', label: 'Dispute', icon: AlertTriangle, count: mockMatches.filter(m => m.status === 'disputed').length },
+              ].map((tab) => (
+                <TouchableOpacity
+                  key={tab.key}
+                  style={styles.premiumTab}
+                  onPress={() => setActiveTab(tab.key as any)}
+                  activeOpacity={0.8}
+                >
+                  {activeTab === tab.key ? (
+                    <LinearGradient
+                      colors={['#3B82F6', '#60A5FA']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.activeTabGradient}
+                    >
+                      <View style={styles.tabContent}>
+                        <tab.icon 
+                          size={16} 
+                          color="#FFFFFF"
+                          strokeWidth={2.5}
+                        />
+                        <Text style={styles.activeTabText}>
+                          {tab.label}
+                        </Text>
+                        {tab.count > 0 && (
+                          <View style={[
+                            styles.premiumBadge,
+                            { backgroundColor: `rgba(${getBadgeRGB(tab.key)}, 0.9)` }
+                          ]}>
+                            <Text style={styles.premiumBadgeText}>
+                              {tab.count}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </LinearGradient>
+                  ) : (
+                    <View style={styles.inactiveTab}>
+                      <View style={styles.tabContent}>
+                        <tab.icon 
+                          size={16} 
+                          color="#64748B"
+                          strokeWidth={2}
+                        />
+                        <Text style={styles.inactiveTabText}>
+                          {tab.label}
+                        </Text>
+                        {tab.count > 0 && (
+                          <View style={[
+                            styles.premiumBadge,
+                            { backgroundColor: `rgba(${getBadgeRGB(tab.key)}, 0.9)` }
+                          ]}>
+                            <Text style={styles.premiumBadgeText}>
+                              {tab.count}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
       </View>
 
       {/* Matches List */}
@@ -607,7 +726,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   tabContainer: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F1F5F9',
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 16,
@@ -651,44 +770,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 2,
+    position: 'relative',
   },
-  modernTabText: {
-    fontSize: 11,
+  activeTabText: {
+    fontSize: 12,
     fontFamily: 'Inter-SemiBold',
-    color: '#64748B',
-    marginLeft: 3,
-    textAlign: 'center',
-    letterSpacing: 0.2,
-  },
-  activeModernTabText: {
     color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    marginLeft: 6,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  modernTabBadge: {
+  inactiveTabText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#64748B',
+    marginLeft: 6,
+    textAlign: 'center',
+    letterSpacing: 0.2,
+  },
+  premiumBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 16,
+    top: -6,
+    right: -8,
+    minWidth: 18,
     height: 16,
-    borderRadius: 8,
+    borderRadius: 999,
+    paddingHorizontal: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  modernTabBadgeText: {
+  premiumBadgeText: {
     fontSize: 9,
     fontFamily: 'Inter-Bold',
     color: '#FFFFFF',
     textAlign: 'center',
+    lineHeight: 12,
   },
   // Legacy styles - can be removed
   tab: {
@@ -913,10 +1039,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 24,
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
+  },
+  glassmorphismContainer: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  androidGlassContainer: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   modalTitle: {
     fontSize: 18,
@@ -972,29 +1122,24 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    marginRight: 12,
+    padding: 8,
+  activeTabGradient: {
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    transform: [{ scale: 1.05 }],
   },
-  checkboxChecked: {
-    backgroundColor: '#1D4ED8',
-    borderColor: '#1D4ED8',
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#0F172A',
-    flex: 1,
-  },
-  submitButton: {
-    backgroundColor: '#F97316',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
+  inactiveTab: {
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    backgroundColor: 'rgba(248, 250, 252, 0.6)',
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
   },
 });
