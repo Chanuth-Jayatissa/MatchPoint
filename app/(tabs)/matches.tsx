@@ -11,8 +11,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trophy, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X, User, MapPin, Calendar, Zap } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Platform } from 'react-native';
 
 interface Match {
@@ -499,71 +497,34 @@ export default function MatchesScreen() {
 
       {/* Sticky Floating Tab Navigation */}
       <View style={styles.stickyTabContainer}>
-        {Platform.OS === 'ios' ? (
-          <BlurView
-            intensity={20}
-            tint="light"
-            style={styles.blurTabContainer}
-          >
-            <View style={styles.tabOverlay} />
-            <View style={styles.stickyTabStrip}>
-              <StaticTab
-                tabKey="accept"
-                icon={Zap}
-                label="Accept"
-                backgroundColor="#facc15"
-              />
-              <StaticTab
-                tabKey="to-log"
-                icon={Clock}
-                label="Log"
-                backgroundColor="#f97316"
-              />
-              <StaticTab
-                tabKey="to-verify"
-                icon={CheckCircle}
-                label="Verify"
-                backgroundColor="#10b981"
-              />
-              <StaticTab
-                tabKey="disputed"
-                icon={AlertTriangle}
-                label="Dispute"
-                backgroundColor="#ef4444"
-              />
-            </View>
-          </BlurView>
-        ) : (
-          <View style={[styles.blurTabContainer, styles.androidTabBackground]}>
-            <View style={styles.tabOverlay} />
-            <View style={styles.stickyTabStrip}>
-              <StaticTab
-                tabKey="accept"
-                icon={Zap}
-                label="Accept"
-                backgroundColor="#facc15"
-              />
-              <StaticTab
-                tabKey="to-log"
-                icon={Clock}
-                label="Log"
-                backgroundColor="#f97316"
-              />
-              <StaticTab
-                tabKey="to-verify"
-                icon={CheckCircle}
-                label="Verify"
-                backgroundColor="#10b981"
-              />
-              <StaticTab
-                tabKey="disputed"
-                icon={AlertTriangle}
-                label="Dispute"
-                backgroundColor="#ef4444"
-              />
-            </View>
+        <View style={styles.floatingTabContainer}>
+          <View style={styles.stickyTabStrip}>
+            <StaticTab
+              tabKey="accept"
+              icon={Zap}
+              label="Accept"
+              backgroundColor="#facc15"
+            />
+            <StaticTab
+              tabKey="to-log"
+              icon={Clock}
+              label="Log"
+              backgroundColor="#f97316"
+            />
+            <StaticTab
+              tabKey="to-verify"
+              icon={CheckCircle}
+              label="Verify"
+              backgroundColor="#10b981"
+            />
+            <StaticTab
+              tabKey="disputed"
+              icon={AlertTriangle}
+              label="Dispute"
+              backgroundColor="#ef4444"
+            />
           </View>
-        )}
+        </View>
       </View>
 
       {/* Matches List */}
@@ -693,23 +654,12 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 12,
   },
-  blurTabContainer: {
+  floatingTabContainer: {
     borderRadius: 24,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  androidTabBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-  },
-  tabOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderRadius: 24,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   stickyTabStrip: {
     flexDirection: 'row',
