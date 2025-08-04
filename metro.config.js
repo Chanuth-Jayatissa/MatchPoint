@@ -3,8 +3,8 @@ const path = require('path');
 
 const config = getDefaultConfig(__dirname);
 
-// Add TTF support for fonts
-config.resolver.assetExts.push('ttf');
+// Add TTF and SVG support for fonts and icons
+config.resolver.assetExts.push('ttf', 'svg');
 
 // Add custom resolver to handle native-only modules on web
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
