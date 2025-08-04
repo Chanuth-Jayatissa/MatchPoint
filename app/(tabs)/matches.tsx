@@ -841,10 +841,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     color: '#64748B',
   },
-  activeTabText: {
-    fontFamily: 'Inter-SemiBold',
-    color: '#FFFFFF',
-  },
   tabBadge: {
     width: 20,
     height: 20,
@@ -1122,7 +1118,35 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 4,
-    padding: 8,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    marginRight: 12,
+  },
+  checkboxChecked: {
+    backgroundColor: '#F97316',
+    borderColor: '#F97316',
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#0F172A',
+  },
+  submitButton: {
+    backgroundColor: '#F97316',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+  },
+  premiumTab: {
+    flex: 1,
+    borderRadius: 999,
+    marginHorizontal: 2,
+  },
   activeTabGradient: {
     borderRadius: 999,
     paddingVertical: 12,
