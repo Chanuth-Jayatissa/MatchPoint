@@ -338,11 +338,6 @@ export default function MatchesScreen() {
                     {label}
                   </Animated.Text>
                 </Animated.View>
-                {count > 0 && (
-                  <View style={styles.fluidBadge}>
-                    <Text style={styles.fluidBadgeText}>{count}</Text>
-                  </View>
-                )}
               </View>
             </LinearGradient>
           ) : (
@@ -352,11 +347,6 @@ export default function MatchesScreen() {
                 color="#64748B"
                 strokeWidth={2}
               />
-              {count > 0 && (
-                <View style={[styles.fluidBadge, { backgroundColor: gradientColors[0] }]}>
-                  <Text style={styles.fluidBadgeText}>{count}</Text>
-                </View>
-              )}
             </View>
           )}
         </Animated.View>
@@ -824,32 +814,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
-  },
-  fluidBadge: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    minWidth: 18,
-    height: 16,
-    borderRadius: 999,
-    paddingHorizontal: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.9)',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  fluidBadgeText: {
-    fontSize: 9,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    lineHeight: 12,
   },
   // Legacy styles for backwards compatibility
   tabContainer: {
