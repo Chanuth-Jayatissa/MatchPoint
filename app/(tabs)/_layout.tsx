@@ -2,7 +2,6 @@ import { Tabs } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import { Platform, View, TouchableOpacity, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import { Chrome as Home, Trophy, Users, MessageCircle, User } from 'lucide-react-native';
 
 // Custom tab bar component for premium floating design
@@ -41,11 +40,6 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   };
 
   const handleTabPress = (route: any, index: number) => {
-    // Haptic feedback
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-
     const event = navigation.emit({
       type: 'tabPress',
       target: route.key,

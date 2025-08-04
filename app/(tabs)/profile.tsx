@@ -10,7 +10,6 @@ import {
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CreditCard as Edit3, Trophy, TrendingUp, Settings, Bell, MapPin, Eye, LogOut, Trash2, Star, Calendar, Target, X } from 'lucide-react-native';
 
 interface SportRating {
   sport: string;

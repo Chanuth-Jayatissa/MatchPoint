@@ -12,7 +12,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Trophy, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X, User, MapPin, Calendar, Zap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Platform } from 'react-native';
 
 interface Match {
   id: string;
