@@ -3,15 +3,19 @@ const path = require('path');
 
 const config = getDefaultConfig(__dirname);
 
+// Enable TypeScript support
+config.resolver.sourceExts.push('ts', 'tsx');
+
 // Add TTF and SVG support for fonts and icons
 config.resolver.assetExts.push('ttf', 'svg');
-
-// Add TypeScript support
-config.resolver.sourceExts.push('ts', 'tsx');
 
 // Add custom resolver to handle native-only modules on web
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
 config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
+// Ensure proper module resolution
+config.resolver.unstable_enableSymlinks = false;
+config.resolver.unstable_enablePackageExports = false;
 
 // Add custom resolver function to handle native modules for web
 const originalResolver = config.resolver.resolveRequest;
