@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",
+    "@expo/cli": "^0.24.20",
     "@expo/vector-icons": "^14.0.0",
     "expo": "~53.0.0",
     "expo-blur": "^14.0.0",
