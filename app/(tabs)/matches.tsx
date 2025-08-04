@@ -497,8 +497,8 @@ export default function MatchesScreen() {
       </View>
 
       {/* Tab Navigation */}
-      <View style={styles.staticTabContainer}>
-        <View style={styles.staticTabStrip}>
+      <View style={styles.floatingTabContainer}>
+        <View style={styles.floatingTabStrip}>
           <StaticTab
             tabKey="accept"
             icon={Zap}
@@ -641,51 +641,51 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     color: '#0F172A',
   },
-  staticTabContainer: {
-    backgroundColor: '#F1F5F9',
+  floatingTabContainer: {
     paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    paddingTop: 20,
+    paddingBottom: 20,
   },
-  staticTabStrip: {
+  floatingTabStrip: {
     flexDirection: 'row',
-    backgroundColor: '#f8fafc',
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 24,
     padding: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   staticTab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 8,
-    borderRadius: 16,
+    borderRadius: 20,
     backgroundColor: 'transparent',
-    minHeight: 44,
+    minHeight: 48,
   },
   activeStaticTab: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
   },
   staticTabLabel: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
     marginLeft: 6,
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   // Legacy styles for backwards compatibility
   fluidTabContainer: {
