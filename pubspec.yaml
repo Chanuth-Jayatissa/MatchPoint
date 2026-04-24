@@ -3,8 +3,12 @@ description: "MatchPoint — Find players, challenge matches, track ratings."
 publish_to: 'none'
 version: 1.0.0+1
 
+dependency_overrides:
+  app_links: ^7.0.0
+  geolocator_android: ^5.0.0
+
 environment:
-  sdk: ^3.5.4
+  sdk: ^3.11.0
 
 dependencies:
   flutter:
@@ -12,19 +16,20 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
+  google_fonts: ^8.0.0
   cached_network_image: ^3.4.1
   flutter_animate: ^4.5.2
 
   # Backend
   supabase_flutter: ^2.8.4
+  app_links: ^7.0.0
 
   # State Management
   flutter_riverpod: ^2.6.1
 
   # Maps & Location
   google_maps_flutter: ^2.10.0
-  geolocator: ^13.0.2
+  geolocator: ^14.0.0
 
   # Utilities
   flutter_dotenv: ^5.2.1

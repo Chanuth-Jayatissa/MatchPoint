@@ -79,7 +79,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (e.toString().contains('already registered')) {
           _errorMessage = 'An account with this email already exists';
         } else {
-          _errorMessage = 'Something went wrong. Please try again.';
+          // Show the actual error message for debugging
+          _errorMessage = e.toString();
+          print("SIGNUP ERROR: $e");
         }
       });
     } finally {
