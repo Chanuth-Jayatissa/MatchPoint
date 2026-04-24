@@ -30,25 +30,9 @@ class AuthService {
       data: {
         'username': username,
         'avatar_url': null,
+        'sports': sports,
       },
     );
-
-    // After signup, update the profile with sports
-    if (response.user != null) {
-      await _client.from('profiles').update({
-        'sports': sports,
-      }).eq('id', response.user!.id);
-
-      // Create sport ratings for each selected sport
-      for (final sport in sports) {
-        await _client.from('sport_ratings').insert({
-          'user_id': response.user!.id,
-          'sport': sport,
-          'rating': 1200,
-          'trend': 'stable',
-        });
-      }
-    }
 
     return response;
   }

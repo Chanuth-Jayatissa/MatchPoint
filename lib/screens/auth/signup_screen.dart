@@ -66,14 +66,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
 
     try {
-      await AuthService.signUp(
+      final response = await AuthService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         username: _usernameController.text.trim(),
         sports: _selectedSports.toList(),
       );
-      // Auth state change will handle navigation
-      if (mounted) Navigator.of(context).pop(); // Return to login → auto-navigates
+      
+      if (mounted) {
+        if (response.session == null) {
+          // Email confirmation is required
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Account created! Please check your email for a verification link.',
+                style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: AppTheme.primaryOrange,
+              duration: const Duration(seconds: 5),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        Navigator.of(context).pop(); // Return to login
+      }
     } catch (e) {
       setState(() {
         if (e.toString().contains('already registered')) {

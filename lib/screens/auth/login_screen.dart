@@ -44,9 +44,14 @@ class _LoginScreenState extends State<LoginScreen> {
       // Auth state change will handle navigation
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString().contains('Invalid login')
-            ? 'Invalid email or password'
-            : 'Something went wrong. Please try again.';
+        if (e.toString().contains('Invalid login credentials')) {
+          _errorMessage = 'Invalid email or password';
+        } else if (e.toString().contains('Email not confirmed')) {
+          _errorMessage = 'Please check your email and click the verification link to activate your account.';
+        } else {
+          _errorMessage = e.toString();
+          print("LOGIN ERROR: $e");
+        }
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
