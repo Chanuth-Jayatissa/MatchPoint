@@ -34,9 +34,15 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="com.matchpoint.matchpoint" android:host="login-callback" />
+                <data android:scheme="com.matchpoint.app" android:host="login-callback" />
             </intent-filter>
         </activity>
+        
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBvgIZlZZa2eREtwbNiKcRkSmlLpqSvmlI" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
