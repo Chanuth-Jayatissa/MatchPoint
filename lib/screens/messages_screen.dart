@@ -1,50 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../theme/app_theme.dart';
 import '../models/thread.dart';
-import '../data/mock_data.dart';
+import '../providers/chat_provider.dart';
 import 'chat_screen.dart';
 
 /// Messages Screen — list of chat threads with unread indicators.
-class MessagesScreen extends StatefulWidget {
+class MessagesScreen extends ConsumerStatefulWidget {
   const MessagesScreen({super.key});
 
   @override
-  State<MessagesScreen> createState() => _MessagesScreenState();
+  ConsumerState<MessagesScreen> createState() => _MessagesScreenState();
 }
 
-class _MessagesScreenState extends State<MessagesScreen> {
-  late List<Thread> _threads;
-
-  @override
-  void initState() {
-    super.initState();
-    _threads = List.from(MockData.threads);
-  }
-
-  int get _unreadCount => _threads.where((t) => t.isUnread).length;
-
+class _MessagesScreenState extends ConsumerState<MessagesScreen> {
   void _openChat(Thread thread) {
-    // Mark as read
-    setState(() {
-      final idx = _threads.indexWhere((t) => t.id == thread.id);
-      if (idx != -1 && _threads[idx].isUnread) {
-        _threads[idx] = Thread(
-          id: thread.id,
-          matchId: thread.matchId,
-          player1Id: thread.player1Id,
-          player2Id: thread.player2Id,
-          otherPlayerUsername: thread.otherPlayerUsername,
-          otherPlayerAvatarUrl: thread.otherPlayerAvatarUrl,
-          lastMessageText: thread.lastMessageText,
-          lastMessageTime: thread.lastMessageTime,
-          isUnread: false,
-          expiresAt: thread.expiresAt,
-          createdAt: thread.createdAt,
-        );
-      }
-    });
-
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ChatScreen(thread: thread),
@@ -54,59 +25,79 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppTheme.border, width: 0.5)),
-            ),
-            child: Row(
-              children: [
-                Text('Messages', style: AppTheme.headingLarge),
-                if (_unreadCount > 0) ...[
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryOrange,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$_unreadCount',
-                      style: AppTheme.caption.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
+    final threadsAsync = ref.watch(chatThreadsStreamProvider);
 
-          // Thread list
-          Expanded(
-            child: _threads.isEmpty
-                ? _buildEmptyState()
-                : ListView.separated(
-                    padding: const EdgeInsets.only(bottom: 100),
-                    itemCount: _threads.length,
-                    separatorBuilder: (_, __) => const Divider(
-                      height: 1,
-                      indent: 76,
-                      color: AppTheme.borderLight,
-                    ),
-                    itemBuilder: (_, i) => _ThreadTile(
-                      thread: _threads[i],
-                      onTap: () => _openChat(_threads[i]),
-                    ),
-                  ),
+    return SafeArea(
+      child: threadsAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppTheme.primaryOrange),
+        ),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'Error loading messages: $err',
+              style: AppTheme.bodyMedium.copyWith(color: AppTheme.errorRed),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ],
+        ),
+        data: (threads) {
+          final unreadCount = threads.where((t) => t.isUnread).length;
+          return Column(
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: AppTheme.border, width: 0.5)),
+                ),
+                child: Row(
+                  children: [
+                    Text('Messages', style: AppTheme.headingLarge),
+                    if (unreadCount > 0) ...[
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryOrange,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$unreadCount',
+                          style: AppTheme.caption.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              // Thread list
+              Expanded(
+                child: threads.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.separated(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemCount: threads.length,
+                        separatorBuilder: (_, __) => const Divider(
+                          height: 1,
+                          indent: 76,
+                          color: AppTheme.borderLight,
+                        ),
+                        itemBuilder: (_, i) => _ThreadTile(
+                          thread: threads[i],
+                          onTap: () => _openChat(threads[i]),
+                        ),
+                      ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

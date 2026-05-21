@@ -1,56 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../models/post.dart';
-import '../data/mock_data.dart';
+import '../providers/post_provider.dart';
 import '../utils/sport_utils.dart';
 import '../widgets/post_card.dart';
 import '../widgets/create_post_modal.dart';
 
 /// Social Screen — sport-filtered community feed with posts.
-class SocialScreen extends StatefulWidget {
+class SocialScreen extends ConsumerStatefulWidget {
   const SocialScreen({super.key});
 
   @override
-  State<SocialScreen> createState() => _SocialScreenState();
+  ConsumerState<SocialScreen> createState() => _SocialScreenState();
 }
 
-class _SocialScreenState extends State<SocialScreen> {
-  late List<Post> _posts;
+class _SocialScreenState extends ConsumerState<SocialScreen> {
   String _selectedSport = 'All';
   String _sortBy = 'recent'; // 'recent' or 'popular'
 
   static const _sportFilters = ['All', 'Pickleball', 'Badminton', 'Table Tennis'];
 
-  @override
-  void initState() {
-    super.initState();
-    _posts = List.from(MockData.posts);
-  }
-
-  List<Post> get _filteredPosts {
-    var posts = _selectedSport == 'All'
-        ? _posts
-        : _posts.where((p) => p.sport == _selectedSport).toList();
+  List<Post> _getFilteredPosts(List<Post> posts) {
+    var filtered = _selectedSport == 'All'
+        ? posts
+        : posts.where((p) => p.sport == _selectedSport).toList();
 
     if (_sortBy == 'popular') {
-      posts = List.from(posts)..sort((a, b) => b.likesCount.compareTo(a.likesCount));
+      filtered = List.from(filtered)..sort((a, b) => b.likesCount.compareTo(a.likesCount));
     } else {
-      posts = List.from(posts)..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      filtered = List.from(filtered)..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
-    return posts;
+    return filtered;
   }
 
   void _handleLike(Post post) {
-    setState(() {
-      final idx = _posts.indexWhere((p) => p.id == post.id);
-      if (idx != -1) {
-        _posts[idx] = _posts[idx].copyWith(
-          isLiked: !_posts[idx].isLiked,
-          likesCount: _posts[idx].isLiked
-              ? _posts[idx].likesCount - 1
-              : _posts[idx].likesCount + 1,
-        );
-      }
+    ref.read(postServiceProvider).toggleLike(post.id, post.isLiked).catchError((e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to like post: $e',
+            style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppTheme.errorRed,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
     });
   }
 
@@ -61,33 +59,39 @@ class _SocialScreenState extends State<SocialScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => CreatePostModal(
         onSubmit: (result) {
-          setState(() {
-            _posts.insert(
-              0,
-              Post(
-                id: 'new_${DateTime.now().millisecondsSinceEpoch}',
-                authorId: 'current_user',
-                authorUsername: 'You',
-                sport: result.sport,
-                content: result.content,
-                tag: result.tag,
-                createdAt: DateTime.now(),
+          ref.read(postServiceProvider).createPost(
+            sport: result.sport,
+            content: result.content,
+            tag: result.tag,
+          ).then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Post created! 🎉',
+                  style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+                ),
+                backgroundColor: AppTheme.successGreen,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+          }).catchError((e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Failed to create post: $e',
+                  style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+                ),
+                backgroundColor: AppTheme.errorRed,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             );
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Post created! 🎉',
-                style: AppTheme.bodyMedium.copyWith(color: Colors.white),
-              ),
-              backgroundColor: AppTheme.successGreen,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          );
         },
       ),
     );
@@ -95,7 +99,7 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filteredPosts;
+    final postsAsync = ref.watch(postsStreamProvider);
 
     return SafeArea(
       child: Stack(
@@ -204,33 +208,51 @@ class _SocialScreenState extends State<SocialScreen> {
 
               // Post feed
               Expanded(
-                child: filtered.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                        itemCount: filtered.length,
-                        itemBuilder: (_, i) => PostCard(
-                          post: filtered[i],
-                          onLike: () => _handleLike(filtered[i]),
-                          onComment: () {
-                            // Comment view — placeholder for now
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Comments coming soon!',
-                                  style: AppTheme.bodyMedium.copyWith(color: Colors.white),
-                                ),
-                                backgroundColor: AppTheme.primaryBlue,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            );
-                          },
-                          onTap: () {},
-                        ),
+                child: postsAsync.when(
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppTheme.primaryOrange),
+                  ),
+                  error: (err, stack) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        'Error loading posts: $err',
+                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.errorRed),
+                        textAlign: TextAlign.center,
                       ),
+                    ),
+                  ),
+                  data: (posts) {
+                    final filtered = _getFilteredPosts(posts);
+                    return filtered.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                            itemCount: filtered.length,
+                            itemBuilder: (_, i) => PostCard(
+                              post: filtered[i],
+                              onLike: () => _handleLike(filtered[i]),
+                              onComment: () {
+                                // Comment view — placeholder for now
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Comments coming soon!',
+                                      style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+                                    ),
+                                    backgroundColor: AppTheme.primaryBlue,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                );
+                              },
+                              onTap: () {},
+                            ),
+                          );
+                  },
+                ),
               ),
             ],
           ),

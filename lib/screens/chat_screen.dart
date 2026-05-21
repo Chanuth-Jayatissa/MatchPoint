@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
 import '../models/thread.dart';
-import '../data/mock_data.dart';
+import '../providers/chat_provider.dart';
+import '../providers/supabase_provider.dart';
 
 /// Full chat view — message bubbles, text input, expiry warning, report/block.
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   final Thread thread;
 
   const ChatScreen({super.key, required this.thread});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
-  late List<Message> _messages;
-  static const _currentUserId = 'current_user';
 
   @override
   void initState() {
     super.initState();
-    _messages = MockData.getMessagesForThread(widget.thread.id);
     // Scroll to bottom after build
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
@@ -48,17 +47,23 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      _messages.add(Message(
-        id: 'msg_${DateTime.now().millisecondsSinceEpoch}',
-        threadId: widget.thread.id,
-        senderId: _currentUserId,
-        content: text,
-        createdAt: DateTime.now(),
-      ));
+    ref.read(chatServiceProvider).sendMessage(
+      threadId: widget.thread.id,
+      content: text,
+    ).then((_) {
+      _messageController.clear();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    }).catchError((e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send message: $e',
+              style: AppTheme.bodyMedium.copyWith(color: Colors.white)),
+          backgroundColor: AppTheme.errorRed,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
     });
-    _messageController.clear();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
   void _showReportBlockSheet() {
@@ -130,6 +135,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final messagesAsync = ref.watch(messagesStreamProvider(widget.thread.id));
+    final currentUserId = ref.watch(supabaseClientProvider).auth.currentUser?.id ?? '';
+
+    // Scroll to bottom when new messages arrive
+    ref.listen<AsyncValue<List<Message>>>(messagesStreamProvider(widget.thread.id), (previous, next) {
+      if (next.hasValue) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
@@ -180,35 +195,52 @@ class _ChatScreenState extends State<ChatScreen> {
 
           // Messages
           Expanded(
-            child: _messages.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.chat_bubble_outline, size: 40, color: AppTheme.borderInput),
-                        const SizedBox(height: 12),
-                        Text('Say hello! 👋', style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary)),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                    itemCount: _messages.length,
-                    itemBuilder: (_, i) {
-                      final msg = _messages[i];
-                      final isMe = msg.isFromUser(_currentUserId);
-                      final showAvatar = !isMe &&
-                          (i == 0 || _messages[i - 1].senderId != msg.senderId);
-
-                      return _MessageBubble(
-                        message: msg,
-                        isMe: isMe,
-                        showAvatar: showAvatar,
-                        otherAvatarUrl: widget.thread.otherPlayerAvatarUrl,
-                      );
-                    },
+            child: messagesAsync.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppTheme.primaryOrange),
+              ),
+              error: (err, stack) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Error loading chat: $err',
+                    style: AppTheme.bodyMedium.copyWith(color: AppTheme.errorRed),
+                    textAlign: TextAlign.center,
                   ),
+                ),
+              ),
+              data: (messages) {
+                return messages.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.chat_bubble_outline, size: 40, color: AppTheme.borderInput),
+                            const SizedBox(height: 12),
+                            Text('Say hello! 👋', style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary)),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                        itemCount: messages.length,
+                        itemBuilder: (_, i) {
+                          final msg = messages[i];
+                          final isMe = msg.isFromUser(currentUserId);
+                          final showAvatar = !isMe &&
+                              (i == 0 || messages[i - 1].senderId != msg.senderId);
+
+                          return _MessageBubble(
+                            message: msg,
+                            isMe: isMe,
+                            showAvatar: showAvatar,
+                            otherAvatarUrl: widget.thread.otherPlayerAvatarUrl,
+                          );
+                        },
+                      );
+              },
+            ),
           ),
 
           // Input bar

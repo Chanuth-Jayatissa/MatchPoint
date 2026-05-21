@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../config/supabase_config.dart';
 import '../theme/app_theme.dart';
 import '../models/player.dart';
 import '../models/play_zone.dart';
 import '../models/court.dart';
-import '../data/mock_data.dart';
+import '../providers/court_provider.dart';
+import '../providers/match_provider.dart';
 import '../utils/sport_utils.dart';
 import '../widgets/player_card.dart';
 import '../widgets/player_detail_sheet.dart';
@@ -14,14 +16,14 @@ import '../widgets/filter_modal.dart';
 
 /// Home Screen — Map-based player discovery with zone markers,
 /// player drawers, challenge flow, and court selection.
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
   // ──── State ────
   GoogleMapController? _mapController;
   PlayZone? _selectedZone;
@@ -89,8 +91,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   // ──── Filtered Data ────
-  List<PlayZone> get _filteredZones {
-    return MockData.playZones.map((zone) {
+  List<PlayZone> _getFilteredZones(List<PlayZone> allZones) {
+    return allZones.map((zone) {
       final filtered = zone.players.where((p) {
         if (_sportFilters.isNotEmpty &&
             !p.sports.any((s) => _sportFilters.contains(s))) {
@@ -103,9 +105,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }).where((z) => z.players.isNotEmpty).toList();
   }
 
-  List<Court> get _filteredCourts {
-    if (_challengeTarget == null) return MockData.courts;
-    return MockData.courts.where((c) {
+  List<Court> _getFilteredCourts(List<Court> allCourts) {
+    if (_challengeTarget == null) return allCourts;
+    return allCourts.where((c) {
       return c.sports.any((s) => _challengeTarget!.sports.contains(s));
     }).toList();
   }
@@ -152,25 +154,45 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _onCourtSelected(Court court) {
+  void _onCourtSelected(Court court) async {
+    if (_challengeTarget == null) return;
+    final opponent = _challengeTarget!;
     _courtDetailController.reverse();
     setState(() {
       _isCourtMode = false;
       _challengeTarget = null;
       _selectedCourt = null;
     });
-    // Navigate to matches tab (index 1) via callback — for now show snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Match challenge sent! Court: ${court.name}',
-          style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+    try {
+      await ref.read(matchServiceProvider).createChallenge(
+        opponentId: opponent.id,
+        sport: opponent.sports.first,
+        courtId: court.id,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Match challenge sent! Court: ${court.name}',
+            style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppTheme.successGreen,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        backgroundColor: AppTheme.successGreen,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to send challenge: $e',
+            style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+          ),
+          backgroundColor: AppTheme.errorRed,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
   }
 
   void _cancelCourtMode() {
@@ -208,9 +230,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   // ──── Map Markers ────
-  Set<Marker> get _markers {
+  Set<Marker> _getMarkers(List<PlayZone> filteredZones, List<Court> filteredCourts) {
     if (_isCourtMode) {
-      return _filteredCourts.map((court) {
+      return filteredCourts.map((court) {
         return Marker(
           markerId: MarkerId('court_${court.id}'),
           position: LatLng(court.latitude, court.longitude),
@@ -220,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }).toSet();
     }
 
-    return _filteredZones.map((zone) {
+    return filteredZones.map((zone) {
       return Marker(
         markerId: MarkerId('zone_${zone.id}'),
         position: LatLng(zone.latitude, zone.longitude),
@@ -235,17 +257,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // ──── Build ────
   @override
   Widget build(BuildContext context) {
+    final playZonesAsync = ref.watch(playZonesProvider);
+    final courtsAsync = ref.watch(courtsProvider);
+
+    final allZones = playZonesAsync.value ?? [];
+    final allCourts = courtsAsync.value ?? [];
+
+    final filteredZones = _getFilteredZones(allZones);
+    final filteredCourts = _getFilteredCourts(allCourts);
+
     return Scaffold(
       body: Stack(
         children: [
           // Map or Placeholder
-          _buildMap(),
+          _buildMap(filteredZones, filteredCourts),
 
           // Header overlay
           _buildHeader(),
 
           // Play Zone badge
-          if (!_isCourtMode) _buildPlayZoneBadge(),
+          if (!_isCourtMode) _buildPlayZoneBadge(allZones),
 
           // Court mode banner
           if (_isCourtMode) _buildCourtModeBanner(),
@@ -295,9 +326,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMap() {
+  Widget _buildMap(List<PlayZone> filteredZones, List<Court> filteredCourts) {
     if (!SupabaseConfig.isMapsConfigured) {
-      return _buildMapPlaceholder();
+      return _buildMapPlaceholder(filteredZones, filteredCourts);
     }
 
     return GoogleMap(
@@ -305,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         target: LatLng(40.7128, -74.0060),
         zoom: 12,
       ),
-      markers: _markers,
+      markers: _getMarkers(filteredZones, filteredCourts),
       onMapCreated: (controller) => _mapController = controller,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
@@ -315,9 +346,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMapPlaceholder() {
-    final zones = _isCourtMode ? <PlayZone>[] : _filteredZones;
-    final courts = _isCourtMode ? _filteredCourts : <Court>[];
+  Widget _buildMapPlaceholder(List<PlayZone> filteredZones, List<Court> filteredCourts) {
+    final zones = _isCourtMode ? <PlayZone>[] : filteredZones;
+    final courts = _isCourtMode ? filteredCourts : <Court>[];
 
     return Container(
       color: AppTheme.surfaceLight,
@@ -433,10 +464,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPlayZoneBadge() {
-    final userZone = MockData.playZones.firstWhere(
+  Widget _buildPlayZoneBadge(List<PlayZone> allZones) {
+    if (allZones.isEmpty) return const SizedBox.shrink();
+    final userZone = allZones.firstWhere(
       (z) => z.isUserZone,
-      orElse: () => MockData.playZones.first,
+      orElse: () => allZones.first,
     );
     return Positioned(
       top: MediaQuery.of(context).padding.top + 64,
